@@ -1,0 +1,34 @@
+{
+  "id": "Id",
+  "action": "Amallar",
+  "enter": "Kiriting...",
+  "select": "Tanlang...",
+  "required": "Bu maydonni to'ldirish majburiy...",
+
+  "shops": "Do'konlar",
+  "statistic": "Do'konlar hisoboti",
+  "notification": "Eslatmalar",
+  "debt_shops": "Qarzdor do'konlar",
+
+  "first_name": "Ism",
+  "last_name": "Familiya",
+  "admin_type": "Foydalanuvchi turi",
+
+  "title_notification": "Sarlavha",
+  "description_notification": "Sarlavha",
+
+  "title": "Nomi",
+  "boss": "Rahbar",
+  "manager": "Ish boshqaruvchi",
+  "responsible_person": "Mas'ul shaxs",
+  "payed_date": "To'lov kuni",
+  "amount": "Oylik to'lov",
+  "location": "Manzil",
+  "phone_number": "Nomer",
+  "additional_phone_number": "Qo'shimch nomer",
+  "block": "Bloklash",
+  "created_at": "Qo'shilgan vaqti",
+  "payment_list": "To'lov jadvali",
+  "username": "Foydalanuvchi nomi",
+  "password": "Parol"
+}

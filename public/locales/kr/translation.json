@@ -1,0 +1,15 @@
+{
+  "id": "Id",
+  "title": "Название фирмы",
+  "boss": "Руководитель",
+  "manager": "Менеджер",
+  "responsible_person": "Ответственное лицо",
+  "payed_date": "Дата оплаты",
+  "amount": "Ежемесячный платеж",
+  "location": "Адрес",
+  "phone_number": "Номер",
+  "additional_phone_number": "Дополнительный номер",
+  "block": "Блокировка",
+  "created_at": "Дата добавления",
+  "payment_list": "График платежей"
+}
