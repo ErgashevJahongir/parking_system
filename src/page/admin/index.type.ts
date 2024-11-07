@@ -1,14 +1,13 @@
 import * as z from "zod";
 import { formSchema } from "./validation";
-import i18next from "i18next";
 import { UseFormReturn } from "react-hook-form";
-import { IStore } from "../shops/index.type";
+import { IOrder } from "../orders/index.type";
 
 export interface IClient {
   id: number;
   full_name: string;
   phone_number: string;
-  orders: IStore[];
+  orders: IOrder[];
   created_at: string;
 }
 
@@ -34,7 +33,7 @@ export interface IClientListResponse {
   per_page: number;
 }
 
-const formSchemaNotification = formSchema(i18next.t);
+const formSchemaNotification = formSchema();
 
 export interface IClientFormProps {
   isLoading: boolean;
