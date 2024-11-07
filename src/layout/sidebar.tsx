@@ -1,6 +1,6 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ChartPie, CircleDollarSign, Mail, Store, User } from "lucide-react";
+import { CircleDollarSign, SquareParking, Store, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 
@@ -50,26 +50,7 @@ const Sidebar = () => {
               </TooltipProvider>
             </Link>
           </li>
-          <li
-            className={cn(
-              "p-2 rounded-lg hover:bg-accent",
-              pathname === "/notification" && "bg-accent"
-            )}
-          >
-            <Link className="flex" to="/notification">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Mail className="size-10" />
-                  </TooltipTrigger>
-                  <TooltipContent side="left">
-                    <p>{t("notification")}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Link>
-          </li>
-          <li
+          {/* <li
             className={cn(
               "p-2 rounded-lg hover:bg-accent",
               pathname === "/report-stores" && "bg-accent"
@@ -87,21 +68,40 @@ const Sidebar = () => {
                 </Tooltip>
               </TooltipProvider>
             </Link>
-          </li>
+          </li> */}
           <li
             className={cn(
               "p-2 rounded-lg hover:bg-accent",
-              pathname === "/admin" && "bg-accent"
+              pathname === "/client" && "bg-accent"
             )}
           >
-            <Link className="flex" to="/admin">
+            <Link className="flex" to="/client">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
                     <User className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>{t("admin")}</p>
+                    <p>{t("Mijozlar")}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Link>
+          </li>
+          <li
+            className={cn(
+              "p-2 rounded-lg hover:bg-accent",
+              pathname === "/parking-type" && "bg-accent"
+            )}
+          >
+            <Link className="flex" to="/parking-type">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <SquareParking className="size-10" />
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>{t("Parkovka turlari")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

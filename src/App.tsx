@@ -1,18 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Shops from "@/page/shops";
+import Shops from "@/page/orders";
 import Layout from "@/layout";
 import ErrorPage from "@/components/error-page";
 import NotFound from "@/components/not-found";
-import ShopCreate from "@/page/shops/create";
-import ShopUpdate from "@/page/shops/update";
 import Login from "@/page/login";
-import NotificationPage from "@/page/notification";
-import DebitorStore from "@/page/debt-shops";
+import NotEndedOrders from "@/page/not-ended-orders";
 import ReportsStore from "@/page/reports-stores";
 import { getBaseName } from "@/utils/get-basename";
 import Admins from "@/page/admin";
-import AdminCreate from "@/page/admin/create";
-import AdminUpdate from "@/page/admin/update";
+import ParkingType from "@/page/parking-type";
 
 const router = createBrowserRouter(
   [
@@ -26,32 +22,16 @@ const router = createBrowserRouter(
           element: <Shops />,
         },
         {
-          path: "store/create",
-          element: <ShopCreate />,
-        },
-        {
-          path: "store/update/:id",
-          element: <ShopUpdate />,
-        },
-        {
-          path: "admin",
+          path: "client",
           element: <Admins />,
         },
         {
-          path: "admin/create",
-          element: <AdminCreate />,
-        },
-        {
-          path: "admin/update/:id",
-          element: <AdminUpdate />,
-        },
-        {
-          path: "notification",
-          element: <NotificationPage />,
+          path: "parking-type",
+          element: <ParkingType />,
         },
         {
           path: "debetor-stores",
-          element: <DebitorStore />,
+          element: <NotEndedOrders />,
         },
         {
           path: "report-stores",

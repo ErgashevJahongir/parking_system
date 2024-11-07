@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
-import { IStore, IStoreReports } from "./page/shops/index.type";
+import { IStore, IStoreReports } from "./page/orders/index.type";
 import { IAdmin } from "./page/admin/index.type";
 
 
-export const data : IStore[] = [
+export const data: IStore[] = [
   {
     id: 1,
     title: "Example Title 1",
@@ -154,7 +154,7 @@ export const data : IStore[] = [
   }
 ]
 
-export const reportsData : IStoreReports[] = [
+export const reportsData: IStoreReports[] = [
   {
     id: 1,
     title: "Example Title 1",
@@ -339,9 +339,9 @@ export const reportsData : IStoreReports[] = [
 
 export const adminData: IAdmin[] = [
   {
-    id:1,
+    id: 1,
     first_name: "Jamol",
-    last_name:"Fayziyev",
+    last_name: "Fayziyev",
     admin_type: "SuperAdmin",
     username: "jamol12",
     password: "jamol12",

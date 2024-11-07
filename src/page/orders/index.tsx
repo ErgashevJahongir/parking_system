@@ -15,8 +15,17 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronDownIcon, HandCoins, Loader, Lock, LockKeyholeOpen, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  HandCoins,
+  Loader,
+  Lock,
+  LockKeyholeOpen,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -29,19 +38,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useCreatePayment, 
-  // useDetails, 
-  useList } from "../shops/services";
-import { IPayment, IStore } from "../shops/index.type";
-import { loadState } from "@/utils/storage";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn, useDebounce } from "@/lib/utils";
+  useCreatePayment, useDelete,
+  // useDetails,
+  useList
+} from "./services";
+import { IPayment, IStore } from "./index.type";
+import { loadState } from "@/utils/storage";
+import { useDebounce } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   Sheet,
   SheetContent,
@@ -70,7 +77,8 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import LoadingComp from "@/components/loadingComp";
-// import dayjs from "dayjs";
+import dayjs from "dayjs";
+import { TableColumnHide } from "@/page/orders/components/table-column-hide";
 import { data } from "@/mock";
 
 interface IPageFilter {
@@ -87,8 +95,9 @@ const formSchema = z.object({
     .min(0),
 });
 
-export default function DebitorStore() {
+export default function MainPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
     size: loadState("table-limit") || 10,
@@ -102,6 +111,7 @@ export default function DebitorStore() {
       searchValue: newQuery === "" ? null : newQuery,
     }));
   }, 1000);
+  const { mutate, isPending: isLoadingDelete } = useDelete();
   const {
     data: tableData,
     // isLoading,
@@ -134,6 +144,18 @@ export default function DebitorStore() {
     });
   }
 
+  const handleDelete = (id: number) => {
+    mutate(id, {
+      onSuccess: () => {
+        toast("Muvaffaqiyatli o'chirildi");
+        refetch();
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+  };
+
   const columns: ColumnDef<IStore>[] = [
     {
       accessorKey: "id",
@@ -156,7 +178,7 @@ export default function DebitorStore() {
       accessorKey: "created_at",
       meta: t("created_at"),
       header: t("created_at"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.original.created_at}</p>,
+      cell: () => <p className="whitespace-nowrap">{dayjs(new Date()).format("DD-MM-YYYY HH:mm")}</p>,
     },
     {
       accessorKey: "action",
@@ -175,6 +197,16 @@ export default function DebitorStore() {
               variant="secondary"
             >
               <HandCoins className="w-4 h-4 md:h-5 md:w-5" />
+            </Button>
+            <Button
+              onClick={() => {
+                navigate(`/store/update/${row.original.id}`);
+              }}
+              size="icon"
+              className="size-8 md:size-10"
+              variant="secondary"
+            >
+              <Pencil className="w-4 h-4 text-warning md:h-5 md:w-5" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -201,7 +233,38 @@ export default function DebitorStore() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => {}}>Tasdiqlash</AlertDialogAction>
+                  <AlertDialogAction
+                    onClick={() => {
+                      handleDelete(row.original.id);
+                    }}
+                  >
+                    Tasdiqlash
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
+                  <Trash2 className="w-4 h-4 text-destructive md:h-5 md:w-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader className="mb-5">
+                  <AlertDialogTitle>Haqiqatdan ham o'chirmoqchimisiz?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Agar tasdiqlasangiz ma'lumot bazadan o'chiriladi
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      handleDelete(row.original.id);
+                    }}
+                  >
+                    Tasdiqlash
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -225,11 +288,15 @@ export default function DebitorStore() {
     <section>
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="font-semibold text-loginTitle">
-          Qarzdor do'konlar
+          Do'konlar
           <sup className="text-mediumParagraph">
             {tableData?.total_count && tableData?.total_count > 0 && tableData?.total_count}
           </sup>
         </h2>
+        <Button onClick={() => navigate("/store/create")} variant="outline">
+          <Plus className="w-4 h-4 mr-2" />
+          Do'kon qo'shish
+        </Button>
       </div>
       <div className="flex flex-col items-center justify-between gap-3 mb-3 sm:flex-row md:mb-4">
         <form className="w-full">
@@ -246,38 +313,7 @@ export default function DebitorStore() {
           </div>
         </form>
         <div className="flex items-center w-full gap-3 md:w-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className={cn(buttonVariants({ variant: "outline", className: "ml-auto" }))}>
-                Ustunlarni sozlash <ChevronDownIcon className="w-4 h-4 ml-2" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => {
-                        if (typeof window !== "undefined") {
-                          window.localStorage.setItem(
-                            "columnVisibilityStore",
-                            JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
-                          );
-                        }
-                        return column.toggleVisibility(!!value);
-                      }}
-                    >
-                      {typeof column.columnDef.header === "string" && column.columnDef.header}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TableColumnHide table={table} columnVisibility={columnVisibility} />
         </div>
       </div>
       <Sheet
@@ -295,12 +331,12 @@ export default function DebitorStore() {
           <SheetHeader>
             <SheetTitle className="text-left">Do'kon to'lovlari</SheetTitle>
           </SheetHeader>
-          {/* {
-          singleLoading ? (
-            <div className="10">
-              <LoadingComp />
-            </div>
-          ) : ( */}
+          {
+            // singleLoading ? (
+            //   <div className="10">
+            //     <LoadingComp />
+            //   </div>
+            // ) : (
             <div className="grid gap-4 py-4">
               <div>
                 <div className="flex justify-end">
@@ -391,7 +427,8 @@ export default function DebitorStore() {
                 </Table>
               </div>
             </div>
-          {/* )} */}
+            // )
+          }
         </SheetContent>
       </Sheet>
       <div className="relative h-[70vh] w-full overflow-y-auto rounded-lg border">
@@ -412,21 +449,16 @@ export default function DebitorStore() {
             ))}
           </TableHeader>
           <TableBody className="w-full">
-            {
-            // isLoading ? (
-            //   <TableRow className="h-[62vh] w-full">
-            //     <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
-            //       <Loader className="mx-auto size-10 animate-spin" />
-            //     </TableCell>
-            //   </TableRow>
-            // ) : 
-            table.getRowModel().rows.length ? (
+            {isLoadingDelete ? (
+              <TableRow className="h-[62vh] w-full">
+                <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
+                  <Loader className="mx-auto size-10 animate-spin" />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  onDoubleClick={() => {
-                    setEditId(row.original);
-                    setTimeout(() => setPayMonitoringSheetOpen(true), 200);
-                  }}
+                  onDoubleClick={() => navigate(`/store/update/${row.original.id}`)}
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
@@ -439,16 +471,13 @@ export default function DebitorStore() {
                   })}
                 </TableRow>
               ))
-            ) 
-            : 
-            (
+            ) : (
               <TableRow className="h-[62vh] w-full">
                 <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
                   Ma'lumot topilmadi.
                 </TableCell>
               </TableRow>
-            )
-            }
+            )}
           </TableBody>
         </Table>
       </div>

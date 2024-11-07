@@ -1,50 +1,54 @@
 import * as z from "zod";
 import { formSchema } from "./validation";
-import i18next from "i18next";
 import { UseFormReturn } from "react-hook-form";
-import { IStore } from "../shops/index.type";
 
-export interface INotification {
+export interface IParkingType {
   id: number;
-  title: string;
-  description: string;
-  stores: IStore[];
+  type: string;
+  last_one_hour: number;
+  last_six_hour: number;
+  over_six_hour: number;
+  parking_count: number;
   created_at: string;
 }
 
-export interface INotificationSingleResponse {
+export interface IParkingTypeSingleResponse {
   success: boolean;
   message: string;
-  results: INotification;
+  results: IParkingType;
 }
 
-export interface INotificationForm {
-  title: string;
-  description: string;
-  stores: string[];
+export interface IParkingTypeForm {
+  type: string;
+  last_one_hour: number;
+  last_six_hour: number;
+  over_six_hour: number;
+  parking_count: number;
 }
 
-export interface INotificationListResponse {
+export interface IParkingTypeListResponse {
   success: boolean;
   message: string;
-  results: INotification[];
+  results: IParkingType[];
   total_count: number;
   page: number;
   page_count: number;
   per_page: number;
 }
 
-const formSchemaNotification = formSchema(i18next.t);
+const formSchemaNotification = formSchema();
 
-export interface INotificationFormProps {
+export interface IParkingTypeFormProps {
   isLoading: boolean;
   isUpdate?: boolean;
   errors?: Error;
   form: UseFormReturn<
     {
-      title: string;
-      description: string;
-      stores: string[];
+      type: string;
+      last_one_hour: number;
+      last_six_hour: number;
+      over_six_hour: number;
+      parking_count: number;
     },
     unknown,
     undefined

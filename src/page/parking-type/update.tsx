@@ -19,7 +19,7 @@ import LoadingComp from "@/components/loadingComp";
 import { toast } from "sonner";
 import { formSchema } from "./validation";
 
-const NotificationUpdate: React.FC<IEditSheetForm> = ({
+const AdminUpdate: React.FC<IEditSheetForm> = ({
   sheetOpen,
   setSheetOpen,
   refetch,
@@ -27,7 +27,7 @@ const NotificationUpdate: React.FC<IEditSheetForm> = ({
   setEditId,
 }) => {
   const { t } = useTranslation();
-  const formSchemaNotification = formSchema(t);
+  const formSchemaNotification = formSchema();
   const [errors, setErrors] = useState<Error>();
   const { data, isLoading: singleLoading } = useDetails(Number(id) as number, !!id);
   const form = useForm<z.infer<typeof formSchemaNotification>>({
@@ -69,11 +69,10 @@ const NotificationUpdate: React.FC<IEditSheetForm> = ({
       <SheetContent
         className="md:max-w-[700px] lg:max-w-[900px]"
         side="right"
-        
       >
         <SheetDescription className="hidden">hide</SheetDescription>
         <SheetHeader>
-          <SheetTitle className="text-left">Bildirishnoma ma'lumotlari</SheetTitle>
+          <SheetTitle className="text-left">Parkovka turi va narx ma'lumotlari</SheetTitle>
         </SheetHeader>
         {singleLoading ? (
           <div className="h-[200px]">
@@ -96,4 +95,4 @@ const NotificationUpdate: React.FC<IEditSheetForm> = ({
   );
 };
 
-export default NotificationUpdate;
+export default AdminUpdate;

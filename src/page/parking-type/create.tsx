@@ -18,9 +18,9 @@ import {
 import { toast } from "sonner";
 import { formSchema } from "./validation";
 
-const NotificationCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpen, refetch }) => {
+const AdminCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpen, refetch }) => {
   const { t } = useTranslation();
-  const formSchemaNotification = formSchema(t);
+  const formSchemaNotification = formSchema();
   const [errors, setErrors] = useState<Error>();
   const form = useForm<z.infer<typeof formSchemaNotification>>({
     resolver: zodResolver(formSchemaNotification),
@@ -30,7 +30,7 @@ const NotificationCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpe
   const handleSubmit = (values: z.infer<typeof formSchemaNotification>) => {
     mutateCreate(values, {
       onSuccess: () => {
-        toast(t("Muvaffaqiyatli o'zgartirildi!"));
+        toast(t("Muvaffaqiyatli qo'shildi!"));
         form.reset();
         setSheetOpen(false);
         refetch();
@@ -55,7 +55,7 @@ const NotificationCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpe
       >
         <SheetDescription className="hidden">hide</SheetDescription>
         <SheetHeader>
-          <SheetTitle className="text-left">Bildirishnoma ma'lumotlari</SheetTitle>
+          <SheetTitle className="text-left">Parkovka turi va narx ma'lumotlari</SheetTitle>
         </SheetHeader>
         <Form {...form}>
           <NotificationForm
@@ -71,4 +71,4 @@ const NotificationCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpe
   );
 };
 
-export default NotificationCreate;
+export default AdminCreate;

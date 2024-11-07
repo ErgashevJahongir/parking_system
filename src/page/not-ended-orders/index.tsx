@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
+import * as z from "zod";
 import {
   ColumnDef,
   flexRender,
@@ -15,12 +16,25 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronDownIcon, HandCoins, Search } from "lucide-react";
+import { ChevronDownIcon, HandCoins, Loader, Lock, LockKeyholeOpen, Search } from "lucide-react";
+import { useState } from "react";
 import {
-  // useDetails,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  useCreatePayment,
+  // useDetails, 
   useList
 } from "../orders/services";
-import { IOrder, IStoreReports } from "../orders/index.type";
+import { IPayment, IStore } from "../orders/index.type";
 import { loadState } from "@/utils/storage";
 import {
   DropdownMenu,
@@ -37,9 +51,29 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 // import LoadingComp from "@/components/loadingComp";
-import { reportsData } from "@/mock";
-import { useState } from "react";
+// import dayjs from "dayjs";
+import { data } from "@/mock";
 
 interface IPageFilter {
   page: number;
@@ -47,7 +81,15 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
-export default function ReportsStore() {
+const formSchema = z.object({
+  amount: z.coerce
+    .number({
+      message: "Maydonni to'ldiring!",
+    })
+    .min(0),
+});
+
+export default function NotEndedOrders() {
   const { t } = useTranslation();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
@@ -72,13 +114,29 @@ export default function ReportsStore() {
   );
 
   const [payMonitoringSheetOpen, setPayMonitoringSheetOpen] = useState(false);
-  const [editId, setEditId] = useState<IStoreReports | null>(null);
+  const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<IStore | null>(null);
   // const { data: singleData, isLoading: singleLoading } = useDetails(
   //   Number(editId) as number,
   //   !!editId,
   // );
+  const { mutate: createPaymentMutate, isPending: isLoadingPayment } = useCreatePayment();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
 
-  const columns: ColumnDef<IStoreReports>[] = [
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    createPaymentMutate(values, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  const columns: ColumnDef<IStore>[] = [
     {
       accessorKey: "id",
       meta: t("id"),
@@ -91,16 +149,16 @@ export default function ReportsStore() {
       cell: ({ row }) => <p className="whitespace-nowrap">{row.original.title}</p>,
     },
     {
-      accessorKey: "sales_count",
-      meta: t("Umumiy savdo soni"),
-      header: t("Umumiy savdo soni"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.original.sales_count}</p>,
+      accessorKey: "amount",
+      meta: t("amount"),
+      header: t("amount"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.original.amount}</p>,
     },
     {
-      accessorKey: "total_sales_price",
-      meta: t("Umumiy savdo summasi"),
-      header: t("Umumiy savdo summasi"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.original.total_sales_price}</p>,
+      accessorKey: "created_at",
+      meta: t("created_at"),
+      header: t("created_at"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.original.created_at}</p>,
     },
     {
       accessorKey: "action",
@@ -120,6 +178,35 @@ export default function ReportsStore() {
             >
               <HandCoins className="w-4 h-4 md:h-5 md:w-5" />
             </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
+                  {row.original.block ? (
+                    <LockKeyholeOpen className="w-4 h-4 text-destructive md:h-5 md:w-5" />
+                  ) : (
+                    <Lock className="w-4 h-4 text-destructive md:h-5 md:w-5" />
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader className="mb-5">
+                  <AlertDialogTitle>
+                    {row.original.block
+                      ? "Haqiqatdan ham blokdan chiqarmoqchimisiz?"
+                      : "Haqiqatdan ham bloklamoqchimisiz?"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {row.original.block
+                      ? "Agar tasdiqlasangiz do'kon blokdan chiqariladi"
+                      : "Agar tasdiqlasangiz do'kon bloklanadi"}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => { }}>Tasdiqlash</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         );
       },
@@ -127,7 +214,7 @@ export default function ReportsStore() {
   ];
 
   const table = useReactTable({
-    data: reportsData,
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -140,7 +227,7 @@ export default function ReportsStore() {
     <section>
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="font-semibold text-loginTitle">
-          Do'konlar hisoboti
+          Qarzdor do'konlar
           <sup className="text-mediumParagraph">
             {tableData?.total_count && tableData?.total_count > 0 && tableData?.total_count}
           </sup>
@@ -208,23 +295,68 @@ export default function ReportsStore() {
         >
           <SheetDescription className="hidden">hide</SheetDescription>
           <SheetHeader>
-            <SheetTitle className="text-left">Do'kon buyurtmalari</SheetTitle>
+            <SheetTitle className="text-left">Do'kon to'lovlari</SheetTitle>
           </SheetHeader>
-          {/* {singleLoading ? (
+          {/* {
+          singleLoading ? (
             <div className="10">
               <LoadingComp />
             </div>
           ) : ( */}
           <div className="grid gap-4 py-4">
             <div>
-              <div className="flex justify-end"></div>
-              <h3 className="py-2 font-medium text-mediumParagraph">Umumiy buyurtmalar</h3>
+              <div className="flex justify-end">
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="default">To'lovni tasqidlash</Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogDescription className="hidden">Hide</DialogDescription>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                        <DialogHeader>
+                          <DialogTitle>To'lovni tasdiqlash</DialogTitle>
+                        </DialogHeader>
+                        <div className="flex items-center w-full">
+                          <FormField
+                            control={form.control}
+                            name="amount"
+                            render={({ field }) => (
+                              <FormItem className="w-full">
+                                <FormLabel>To'lov miqdori</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder="To'lov miqdorini kiriting"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <DialogFooter className="justify-end">
+                          <DialogClose asChild>
+                            <Button onClick={() => form.reset()} type="reset" variant="secondary">
+                              Yopish
+                            </Button>
+                          </DialogClose>
+                          <Button disabled={isLoadingPayment} type="submit">
+                            {isLoadingPayment ? <Loader className="mr-2 animate-spin" /> : null}
+                            Tasdiqlash
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <h3 className="py-2 font-medium text-mediumParagraph">Umumiy to'lovlar</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-10">Id</TableHead>
-                    <TableHead className="w-10">Mahsulot</TableHead>
-                    <TableHead className="w-10">Kredit vaqti</TableHead>
                     <TableHead>To'lov</TableHead>
                     <TableHead>Holat</TableHead>
                     <TableHead>Qoldiq</TableHead>
@@ -232,11 +364,9 @@ export default function ReportsStore() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {editId?.orders.map((payment: IOrder) => (
+                  {editId?.payment_list.map((payment: IPayment) => (
                     <TableRow key={payment.id}>
                       <TableCell className="py-2 md:py-2">{payment.id}</TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.product}</TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.month}</TableCell>
                       <TableCell className="py-2 md:py-2">{payment.amount}</TableCell>
                       <TableCell className="py-2 md:py-2">
                         {payment.payed ? (
@@ -311,13 +441,16 @@ export default function ReportsStore() {
                     })}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow className="h-[62vh] w-full">
-                  <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
-                    Ma'lumot topilmadi.
-                  </TableCell>
-                </TableRow>
-              )}
+              )
+                :
+                (
+                  <TableRow className="h-[62vh] w-full">
+                    <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
+                      Ma'lumot topilmadi.
+                    </TableCell>
+                  </TableRow>
+                )
+            }
           </TableBody>
         </Table>
       </div>

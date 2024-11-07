@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
-  INotificationForm,
-  INotificationListResponse,
-  INotificationSingleResponse,
+  IClientForm,
+  IClientListResponse,
+  IClientSingleResponse,
 } from "./index.type";
 import request from "@/services/request";
 
 export const useList = (page: number, per_page: number, search: string | null) =>
-  useQuery<INotificationListResponse>({
+  useQuery<IClientListResponse>({
     queryKey: ["list-stores", page, per_page, search],
     queryFn: () =>
       request.private
@@ -19,12 +19,12 @@ export const useList = (page: number, per_page: number, search: string | null) =
 export const useCreate = () =>
   useMutation({
     mutationKey: ["create-store"],
-    mutationFn: (data: INotificationForm) =>
+    mutationFn: (data: IClientForm) =>
       request.private.post("store/", data).then((res) => res.data),
   });
 
 export const useDetails = (id: number, openModal: boolean) =>
-  useQuery<INotificationSingleResponse>({
+  useQuery<IClientSingleResponse>({
     queryKey: [`store-detail-${id}`, id],
     queryFn: () => request.private.get(`store/${id}`).then((res) => res.data),
     enabled: openModal,
@@ -33,7 +33,7 @@ export const useDetails = (id: number, openModal: boolean) =>
 export const useUpdate = (id: number) =>
   useMutation({
     mutationKey: ["update-store"],
-    mutationFn: (data: INotificationForm) =>
+    mutationFn: (data: IClientForm) =>
       request.private.put(`store/${id}`, data).then((res) => res.data),
   });
 

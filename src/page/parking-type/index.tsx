@@ -29,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useDelete, useList } from "./services";
-import { INotification } from "./index.type";
+import { IParkingType } from "./index.type";
 import { loadState } from "@/utils/storage";
 import {
   DropdownMenu,
@@ -41,12 +41,9 @@ import { cn, useDebounce } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 // import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import NotificationUpdate from "./update";
-import NotificationCreate from "./create";
+import ClientUpdate from "./update";
+import ClientCreate from "./create";
 import dayjs from "dayjs";
-import { IStore } from "../shops/index.type";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IPageFilter {
   page: number;
@@ -54,90 +51,38 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
-const storeData: IStore[] = [
+const data: IParkingType[] = [
   {
     id: 1,
-    title: "Example Title 1",
-    boss: "Boss Name 1",
-    manager: "Manager Name 1",
-    responsible_person: "Responsible Person 1",
-    password: "password123",
-    username: "username1",
-    additional_phone_number: "1234567890",
-    phone_number: "0987654321",
-    location: "Location 1",
-    amount: 100,
-    payed_date: dayjs(new Date()).format("DD-MM-YYYY"),
-    block: false,
-    is_active: true,
+    type: "Example Title 1",
     created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    payment_list: []
+    last_one_hour: 10000,
+    last_six_hour: 8000,
+    over_six_hour: 5000,
+    parking_count: 100
   },
   {
     id: 2,
-    title: "Example Title 2",
-    boss: "Boss Name 2",
-    manager: "Manager Name 2",
-    responsible_person: "Responsible Person 2",
-    password: "password456",
-    username: "username2",
-    additional_phone_number: "2345678901",
-    phone_number: "9876543210",
-    location: "Location 2",
-    amount: 200,
-    payed_date: dayjs(new Date()).format("DD-MM-YYYY"),
-    block: false,
-    is_active: true,
+    type: "Example Title 2",
     created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    payment_list: []
+    last_one_hour: 10000,
+    last_six_hour: 8000,
+    over_six_hour: 5000,
+    parking_count: 100
   },
   {
     id: 3,
-    title: "Example Title 3",
-    boss: "Boss Name 3",
-    manager: "Manager Name 3",
-    responsible_person: "Responsible Person 3",
-    password: "password789",
-    username: "username3",
-    additional_phone_number: "3456789012",
-    phone_number: "8765432109",
-    location: "Location 3",
-    amount: 300,
-    payed_date: dayjs(new Date()).format("DD-MM-YYYY"),
-    block: false,
-    is_active: true,
+    type: "Example Title 3",
     created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    payment_list: []
+    last_one_hour: 10000,
+    last_six_hour: 8000,
+    over_six_hour: 5000,
+    parking_count: 100
   }
 ]
 
-const data: INotification[] = [
-  {
-    id: 1,
-    title: "Example Title 1",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    description: "description2",
-    stores: [storeData[1], storeData[2]]
-  },
-  {
-    id: 2,
-    title: "Example Title 2",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    description: "description2",
-    stores: [storeData[1], storeData[2]]
-  },
-  {
-    id: 3,
-    title: "Example Title 3",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    description: "description2",
-    stores: [storeData[1], storeData[0]]
-  }
-]
-
-export default function NotificationPage() {
+export default function ClientPage() {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
     size: loadState("table-limit") || 10,
@@ -175,13 +120,13 @@ export default function NotificationPage() {
   };
 
   useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityNotification") || "{}")
+    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityClient") || "{}")
     if (storedData) {
       setColumnVisibility(storedData)
     }
   }, [])
 
-  const columns: ColumnDef<INotification>[] = [
+  const columns: ColumnDef<IParkingType>[] = [
     {
       accessorKey: "id",
       meta: t("id"),
@@ -194,29 +139,28 @@ export default function NotificationPage() {
       cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("created_at")}</p>,
     },
     {
-      accessorKey: "title",
-      meta: t("title_notification"),
-      header: t("title_notification"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("title")}</p>,
+      accessorKey: "type",
+      meta: t("Turi"),
+      header: t("Turi"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("type")}</p>,
     },
     {
-      accessorKey: "stores",
-      meta: "Do'konlar",
-      header: "Do'konlar",
-      cell: ({ row }) => <div className="flex items-center whitespace-nowrap">{row.original.stores?.map((item) => {
-        return <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Avatar>
-                <AvatarFallback>{item?.title && Array.from(item?.title)[0]}</AvatarFallback>
-              </Avatar>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{item?.title}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      })}</div>,
+      accessorKey: "last_one_hour",
+      meta: t("1 soatgacha uchun"),
+      header: t("1 soatgacha uchun"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_one_hour")}</p>,
+    },
+    {
+      accessorKey: "last_six_hour",
+      meta: t("6 soatgacha uchun"),
+      header: t("6 soatgacha uchun"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_six_hour")}</p>,
+    },
+    {
+      accessorKey: "over_six_hour",
+      meta: t("6 soatdan ko'p uchun"),
+      header: t("6 soatdan ko'p uchun"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("over_six_hour")}</p>,
     },
     {
       accessorKey: "action",
@@ -281,14 +225,14 @@ export default function NotificationPage() {
     <section>
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="font-semibold text-loginTitle">
-          Bildirishnomalar
+          Parkovka turi va narxlar
           <sup className="text-mediumParagraph">
             {tableData?.total_count && tableData?.total_count > 0 && tableData?.total_count}
           </sup>
         </h2>
         <Button onClick={() => setAddSheetOpen(true)} variant="outline">
           <Plus className="w-4 h-4 mr-2" />
-          Bildirishnoma qo'shish
+          Parkovka turi va narx  qo'shish
         </Button>
       </div>
       <div className="flex flex-col items-center justify-between gap-3 mb-3 sm:flex-row md:mb-4">
@@ -325,7 +269,7 @@ export default function NotificationPage() {
                       onCheckedChange={(value) => {
                         if (typeof window !== "undefined") {
                           window.localStorage.setItem(
-                            "columnVisibilityNotification",
+                            "columnVisibilityClient",
                             JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
                           );
                         }
@@ -366,21 +310,22 @@ export default function NotificationPage() {
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
-                return(
-                <TableRow
-                  // onDoubleClick={() => navigate(`/store/update/${row.original.id}`)}
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    return (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              )})
+                return (
+                  <TableRow
+                    // onDoubleClick={() => navigate(`/store/update/${row.original.id}`)}
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow className="h-[62vh] w-full">
                 <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
@@ -391,12 +336,12 @@ export default function NotificationPage() {
           </TableBody>
         </Table>
       </div>
-      <NotificationCreate
+      <ClientCreate
         setSheetOpen={setAddSheetOpen}
         sheetOpen={addSheetOpen}
         refetch={refetch}
       />
-      <NotificationUpdate
+      <ClientUpdate
         setSheetOpen={setEditSheetOpen}
         sheetOpen={editSheetOpen}
         refetch={refetch}

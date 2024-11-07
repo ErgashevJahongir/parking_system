@@ -1,62 +1,68 @@
-import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
-import i18next from "i18next";
 import { formSchema } from "./validation";
+import i18next from "i18next";
+import { UseFormReturn } from "react-hook-form";
+import { IStore } from "../shops/index.type";
 
-export interface IPayment {
+export interface IClient {
   id: number;
-  amount: number;
-  payed: boolean;
-  residual: number;
-  date: string;
+  full_name: string;
+  phone_number: string;
+  orders: IStore[];
+  created_at: string;
 }
 
-export interface IAdmin {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  admin_type: string
-  password: string
-  phone_number: string
-}
-
-export interface IAdminSingleResponse {
+export interface IClientSingleResponse {
   success: boolean;
   message: string;
-  results: IAdmin;
+  results: IClient;
 }
 
-export interface IAdminForm {
-  title: string;
-  is_active: boolean;
+export interface IClientForm {
+  full_name: string;
+  phone_number: string;
+  stores: string[];
 }
 
-export interface IAdminListResponse {
+export interface IClientListResponse {
   success: boolean;
   message: string;
-  results: IAdmin[];
+  results: IClient[];
   total_count: number;
   page: number;
   page_count: number;
   per_page: number;
 }
 
-const formSchemaShop = formSchema(i18next.t);
+const formSchemaNotification = formSchema(i18next.t);
 
-export interface IAdminForm {
+export interface IClientFormProps {
+  isLoading: boolean;
+  isUpdate?: boolean;
+  errors?: Error;
   form: UseFormReturn<
     {
-      username: string;
-      first_name: string;
-      last_name: string;
-      admin_type: string
-      phone_number: string
-      password: string
+      full_name: string;
+      phone_number: string;
+      stores: string[];
     },
     unknown,
     undefined
   >;
-  children: React.ReactNode;
-  handleSubmit: (values: z.infer<typeof formSchemaShop>) => void;
+  buttonText: string;
+  handleSubmit: (values: z.infer<typeof formSchemaNotification>) => void;
+}
+
+export interface IEditSheetForm {
+  sheetOpen: boolean;
+  setSheetOpen: (isOpenModal: boolean) => void;
+  refetch: () => void;
+  id: number | null;
+  setEditId: (id: number | null) => void;
+}
+
+export interface ICreateSheetForm {
+  sheetOpen: boolean;
+  setSheetOpen: (isOpenModal: boolean) => void;
+  refetch: () => void;
 }
