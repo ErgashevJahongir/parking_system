@@ -14,6 +14,9 @@ const formSchema = () =>
     over_six_hour: z.number().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
+    parking_count: z.number().min(2, {
+      message: "Bu maydonni to'ldirish majburiy...",
+    }),
   });
 
 export { formSchema };

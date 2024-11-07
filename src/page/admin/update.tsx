@@ -27,7 +27,7 @@ const AdminUpdate: React.FC<IEditSheetForm> = ({
   setEditId,
 }) => {
   const { t } = useTranslation();
-  const formSchemaNotification = formSchema(t);
+  const formSchemaNotification = formSchema();
   const [errors, setErrors] = useState<Error>();
   const { data, isLoading: singleLoading } = useDetails(Number(id) as number, !!id);
   const form = useForm<z.infer<typeof formSchemaNotification>>({
