@@ -35,10 +35,6 @@ export async function errorHandler(error: AxiosError): Promise<void> {
 
   console.error(error?.message);
 
-  console.log("Error config object:", error.config);
-
-  console.log("\nError object as json:", error.toJSON());
-
   return await Promise.reject(error);
 }
 

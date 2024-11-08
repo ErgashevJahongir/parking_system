@@ -25,7 +25,7 @@ const Sidebar = () => {
                     <SquareParking className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>{t("shops")}</p>
+                    <p>{t("Parkovkalar")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -44,7 +44,7 @@ const Sidebar = () => {
                     <CircleDollarSign className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>{t("debt_shops")}</p>
+                    <p>{t("Tugallanmagan parkovkalar")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
