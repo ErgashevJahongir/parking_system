@@ -65,7 +65,7 @@ export default function Header() {
       <div className="flex items-center gap-2">
         <MobileMenu />
         <Link to="/">
-          <h1 className="text-2xl font-semibold">Just Parking</h1>
+          <h1 className="text-2xl font-semibold">Milliy Avtoturargoh</h1>
         </Link>
       </div>
       <div className="flex items-center gap-2">
