@@ -1,51 +1,55 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
+  IClient,
   IClientForm,
   IClientListResponse,
-  IClientSingleResponse,
 } from "./index.type";
 import request from "@/services/request";
+import { IParkingListResponse } from "../parkings/index.type";
 
 export const useList = (page: number, per_page: number, search: string | null) =>
   useQuery<IClientListResponse>({
-    queryKey: ["list-stores", page, per_page, search],
+    queryKey: ["list-clients", page, per_page, search],
     queryFn: () =>
       request.private
-        .get("store", { params: { page, per_page, title: search } })
+        .get("clients", { params: { page, per_page, search: search } })
         .then((res) => res.data),
   });
 
 export const useCreate = () =>
   useMutation({
-    mutationKey: ["create-store"],
+    mutationKey: ["create-client"],
     mutationFn: (data: IClientForm) =>
-      request.private.post("store/", data).then((res) => res.data),
+      request.private.post("client/register", data).then((res) => res.data),
   });
 
-export const useDetails = (id: number, openModal: boolean) =>
-  useQuery<IClientSingleResponse>({
-    queryKey: [`store-detail-${id}`, id],
-    queryFn: () => request.private.get(`store/${id}`).then((res) => res.data),
+export const useDetails = (id: string, openModal: boolean) =>
+  useQuery<IClient>({
+    queryKey: [`client-detail-${id}`, id],
+    queryFn: () => request.private.get(`client/${id}`).then((res) => res.data),
     enabled: openModal,
   });
 
-export const useUpdate = (id: number) =>
+export const useUpdate = (id: string) =>
   useMutation({
-    mutationKey: ["update-store"],
+    mutationKey: ["update-client"],
     mutationFn: (data: IClientForm) =>
-      request.private.put(`store/${id}`, data).then((res) => res.data),
+      request.private.put(`client/${id}`, data).then((res) => res.data),
   });
 
 export const useDelete = () =>
   useMutation({
-    mutationKey: ["delete-store"],
-    mutationFn: (id: number) => request.private.delete(`store/${id}`).then((res) => res.data),
+    mutationKey: ["delete-client"],
+    mutationFn: (id: string) => request.private.delete(`client/${id}`).then((res) => res.data),
   });
 
-export const useCreatePayment = async () =>
-  useMutation({
-    mutationKey: ["create-payment"],
-    mutationFn: (data: { amount: number }) =>
-      request.private.post("/admin/update/student/monthly/payment/", data).then((res) => res.data),
+export const useListParking = (page: number, per_page: number, search: string | null, id: string, openModal: boolean) =>
+  useQuery<IParkingListResponse>({
+    queryKey: ["list-parking", page, per_page, search],
+    queryFn: () =>
+      request.private
+        .get(`reservations/client/${id}`, { params: { page: page, limit: per_page, search: search } })
+        .then((res) => res.data),
+    enabled: openModal,
   });

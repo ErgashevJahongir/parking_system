@@ -2,42 +2,39 @@ import * as z from "zod";
 import { formSchema } from "./validation";
 import { UseFormReturn } from "react-hook-form";
 
-export interface IParkingType {
+export interface IParking {
   id: string;
-  type: string;
-  last_one_hour: number;
-  last_six_hour: number;
-  over_six_hour: number;
-  parking_count: number;
+  car_number: string;
+  parking_rate_id: string;
+  user_id?: string | null;
+  start_time: string;
+  end_timeы: string;
 }
 
-export interface IParkingTypeForm {
-  type: string;
-  last_one_hour: number;
-  last_six_hour: number;
-  over_six_hour: number;
-  parking_count: number;
+export interface IParkingForm {
+  car_number: string;
+  parking_rate_id: string;
+  start_time: string
+  user_id?: string | null;
 }
 
-export interface IParkingTypeListResponse {
-  parking_rates: IParkingType[];
+export interface IParkingListResponse {
+  reservations: IParking[];
   count: number;
   page: number;
 }
 
 const formSchemaNotification = formSchema();
 
-export interface IParkingTypeFormProps {
+export interface IParkingFormProps {
   isLoading: boolean;
   isUpdate?: boolean;
   errors?: Error;
   form: UseFormReturn<
     {
-      type: string;
-      last_one_hour: number;
-      last_six_hour: number;
-      over_six_hour: number;
-      parking_count: number;
+      car_number: string;
+      parking_rate_id: string;
+      user_id?: string | null;
     },
     unknown,
     undefined

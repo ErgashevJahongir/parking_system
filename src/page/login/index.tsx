@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
-import { loginRequest } from "@/services/request";
+import { getUserData, loginRequest } from "@/services/request";
 import { useToast } from "@/components/ui/use-toast";
 import { ILoginForm } from "@/types";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ export default function Login() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      username: "",
+      phone_number: "",
       password: "",
     },
   });
@@ -35,11 +35,12 @@ export default function Login() {
     setIsLoading(true);
     try {
       const data = await loginRequest(values);
-      setAccessToken(data?.access);
+      setAccessToken(data?.access_token);
       if (data) {
+        const userData = await getUserData(data?.access_token)
+        setUser(userData);
         navigate("/");
         reset();
-        setUser(data);
       }
     } catch (error: unknown) {
       console.error(error);
@@ -79,18 +80,18 @@ export default function Login() {
             </div>
             <div className="grid gap-4 md:gap-8">
               <div className="grid gap-2">
-                <Label htmlFor="text" className="text-sm md:text-base">
-                  Hisobingiz
+                <Label htmlFor="phone_number" className="text-sm md:text-base">
+                  Telefon nomer
                 </Label>
                 <Input
-                  id="text"
+                  id="phone_number"
                   type="text"
-                  {...register("username", { required: true })}
-                  placeholder="Foydalanuvchi hidobingizni kiriting..."
+                  {...register("phone_number", { required: true })}
+                  placeholder="Telefon nomeringizni kiriting..."
                 />
-                {errors?.username && (
+                {errors?.phone_number && (
                   <span className="inline-block mt-1 text-red-500">
-                    Foydalanuvchi hidobingizni kiriting...
+                    Telefon nomeringizni kiriting...
                   </span>
                 )}
               </div>

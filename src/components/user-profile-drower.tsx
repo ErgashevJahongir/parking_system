@@ -13,7 +13,7 @@ export default function UserProfilData() {
   const navigate = useNavigate();
 
   function logOut() {
-    localStorage.removeItem("uni-hostel");
+    localStorage.removeItem("token-parking");
     setUser(null);
     setToken(null);
     navigate("/login");
@@ -32,7 +32,7 @@ export default function UserProfilData() {
           </Button>
           <div className="hidden sm:block">
             <h4 className="font-bold text-paragraphDefault">{user?.fullname || "Jamoliddin Toshboyev"}</h4>
-            <p className="text-smallparagraph">{`@${user?.username || "jamoliddinadmin"}`}</p>
+            <p className="text-smallparagraph">{`@${user?.phone_number || "jamoliddinadmin"}`}</p>
           </div>
         </div>
       </SheetTrigger>
@@ -51,7 +51,7 @@ export default function UserProfilData() {
             </Button>
             <div className="text-left">
               <h4 className="font-bold text-paragraphDefault">{user?.fullname || "Jamoliddin Toshboyev"}</h4>
-              <p className="text-smallparagraph">{`@${user?.username || "jamoliddinadmin"}`}</p>
+              <p className="text-smallparagraph">{`@${user?.phone_number || "jamoliddinadmin"}`}</p>
             </div>
           </div>
           <Separator className="my-4" />

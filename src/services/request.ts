@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosHeaders, InternalAxiosRequestConfig } from "axios";
-import { loadSessionState } from "@/utils/storage";
+import { loadState } from "@/utils/storage";
 
 const request = {
   private: axios.create({ baseURL: import.meta.env.VITE_APP_API_URL }),
@@ -7,13 +7,14 @@ const request = {
 };
 
 request.private.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = loadSessionState("token-cpm");
+  const token = loadState("token-parking");
+
   if (token) {
     if (!config.headers) {
       config.headers = new AxiosHeaders();
     }
 
-    (config.headers as AxiosHeaders).set("Authorization", `Bearer ${token.access}`);
+    (config.headers as AxiosHeaders).set("Authorization", `${token?.state?.token}`);
   }
 
   return config;
@@ -21,20 +22,9 @@ request.private.interceptors.request.use((config: InternalAxiosRequestConfig) =>
 
 export async function errorHandler(error: AxiosError): Promise<void> {
   if (error.response) {
-    if (error.response?.status === 403) {
-      const token = loadSessionState("token-cpm");
-      const refresh = token?.refresh;
-
-      if (refresh !== null) {
-        try {
-          // some logic
-        } catch (err) {
-          sessionStorage.removeItem("token-baraka");
-          sessionStorage.removeItem("user-baraka");
-        } finally {
-          window.location.reload();
-        }
-      }
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token-parking");
+      window.location.reload();
     }
 
     return await Promise.reject(error.response);
@@ -52,18 +42,17 @@ export async function errorHandler(error: AxiosError): Promise<void> {
   return await Promise.reject(error);
 }
 
-// request.private.interceptors.response.use(
-//   (response) => response,
-//   async (error) => errorHandler(error),
-// );
-
-export const loginRequest = async (data: { username: string; password: string }) => {
-  const res = await request.public.post("/auth-token/create/", data).then((res) => res.data);
+export const loginRequest = async (data: { phone_number: string; password: string }) => {
+  const res = await request.public.post("user/login", data).then((res) => res);
   return res.data;
 };
 
-export const getUserData = async () => {
-  const res = await request.private.get("/auth-me/");
+export const getUserData = async (token: string) => {
+  const res = await request.public.get("user/", {
+    headers: {
+      Authorization: `${token}`
+    }
+  }).then((res) => res);
   return res.data;
 };
 

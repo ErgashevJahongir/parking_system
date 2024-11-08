@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useDelete, useList } from "./services";
+import { useDelete, useList, useListParking } from "./services";
 import { IClient } from "./index.type";
 import { loadState } from "@/utils/storage";
 import {
@@ -42,9 +42,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import ClientUpdate from "./update";
 import ClientCreate from "./create";
-import dayjs from "dayjs";
-import { IOrder } from "../orders/index.type";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import dayjs from "dayjs";
+import LoadingComp from "@/components/loadingComp";
+import { IParking } from "../parkings/index.type";
 
 interface IPageFilter {
   page: number;
@@ -52,171 +53,8 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
-const data: IClient[] = [
-  {
-    id: 1,
-    full_name: "Example Title 1",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    phone_number: "description2",
-    orders: [
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 5000000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 500000
-      },
-      {
-        id: 10,
-        amount: 400000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 200000
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-    ]
-  },
-  {
-    id: 2,
-    full_name: "Example Title 2",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    phone_number: "description2",
-    orders: [
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 5000000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 500000
-      },
-      {
-        id: 10,
-        amount: 400000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 200000
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-    ]
-  },
-  {
-    id: 3,
-    full_name: "Example Title 3",
-    created_at: dayjs(new Date()).format("DD-MM-YYYY HH:mm"),
-    phone_number: "description2",
-    orders: [
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 5000000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 500000
-      },
-      {
-        id: 10,
-        amount: 400000,
-        payed: false,
-        product: "Kompyuter",
-        month: 10,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 200000
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-      {
-        id: 10,
-        amount: 50000,
-        payed: true,
-        product: "Telefon",
-        month: 6,
-        date: dayjs(new Date()).format("DD-MM"),
-        residual: 0
-      },
-    ]
-  }
-]
-
 export default function ClientPage() {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
     size: loadState("table-limit") || 10,
@@ -239,11 +77,12 @@ export default function ClientPage() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [addSheetOpen, setAddSheetOpen] = useState(false);
   const [editSheetOpen, setEditSheetOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [payMonitoringSheetOpen, setPayMonitoringSheetOpen] = useState(false);
-  const [userId, setUserId] = useState<IClient | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const { data: userParkings, isLoading: userParkingsLoading } = useListParking(pageFilter?.page, pageFilter?.size, null, userId as string, !!userId);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     mutate(id, {
       onSuccess: () => {
         toast("Muvaffaqiyatli o'chirildi");
@@ -272,13 +111,13 @@ export default function ClientPage() {
       accessorKey: "created_at",
       meta: t("created_at"),
       header: t("created_at"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("created_at")}</p>,
+      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("created_at")).format("YYYY-MM-DD HH:mm:ss")}</p>,
     },
     {
-      accessorKey: "full_name",
+      accessorKey: "name",
       meta: t("FISH"),
       header: t("FISH"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("full_name")}</p>,
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("name")}</p>,
     },
     {
       accessorKey: "phone_number",
@@ -301,7 +140,7 @@ export default function ClientPage() {
           <div className="flex items-center gap-2">
             <Button
               onClick={() => {
-                setUserId(row.original);
+                setUserId(row.original.id);
                 setTimeout(() => setPayMonitoringSheetOpen(true), 200);
               }}
               size="icon"
@@ -312,8 +151,8 @@ export default function ClientPage() {
             </Button>
             <Button
               onClick={() => {
-                // setEditId(row.original.id);
-                // setTimeout(() => setEditSheetOpen(true), 200);
+                setEditId(row.original.id);
+                setTimeout(() => setEditSheetOpen(true), 200);
               }}
               size="icon"
               className="size-8 md:size-10"
@@ -353,8 +192,56 @@ export default function ClientPage() {
   ];
 
   const table = useReactTable({
-    data,
+    data: tableData?.clients || [],
     columns,
+    getCoreRowModel: getCoreRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      columnVisibility,
+    },
+  });
+
+  const columnsParking: ColumnDef<IParking>[] = [
+    {
+      accessorKey: "id",
+      meta: t("id"),
+      header: t("id"),
+    },
+    {
+      accessorKey: "type",
+      meta: t("Turi"),
+      header: t("Turi"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("type")}</p>,
+    },
+    {
+      accessorKey: "car_number",
+      meta: t("Mashina raqami"),
+      header: t("Mashina raqami"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("car_number")}</p>,
+    },
+    {
+      accessorKey: "start_time",
+      meta: t("Kirish vaqti"),
+      header: t("Kirish vaqti"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("start_time")).format("YYYY-MM-DD HH:mm:ss")}</p>,
+    },
+    {
+      accessorKey: "end_time",
+      meta: t("Chiqish vaqti"),
+      header: t("Chiqish vaqti"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{(row.getValue("end_time")) ? dayjs(row.getValue("end_time")).format("YYYY-MM-DD HH:mm:ss") : ""}</p>,
+    },
+    {
+      accessorKey: "summ",
+      meta: t("Summa"),
+      header: t("Summa"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("summ")}</p>,
+    },
+  ];
+
+  const tableParking = useReactTable({
+    data: userParkings?.reservations || [],
+    columns: columnsParking,
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: {
@@ -367,8 +254,8 @@ export default function ClientPage() {
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="font-semibold text-loginTitle">
           Mijozlar
-          <sup className="text-mediumParagraph">
-            {tableData?.total_count && tableData?.total_count > 0 && tableData?.total_count}
+          <sup className="text-mediumParagraph ml-1.5">
+            {tableData?.count && tableData?.count > 0 && tableData?.count}
           </sup>
         </h2>
         <Button onClick={() => setAddSheetOpen(true)} variant="outline">
@@ -425,7 +312,7 @@ export default function ClientPage() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="relative h-[70vh] w-full overflow-y-auto rounded-lg border">
+      <div className="relative max-h-[70vh] w-full overflow-y-auto rounded-lg border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -490,62 +377,63 @@ export default function ClientPage() {
         >
           <SheetDescription className="hidden">hide</SheetDescription>
           <SheetHeader>
-            <SheetTitle className="text-left">Mijov buyurtmalari</SheetTitle>
+            <SheetTitle className="text-left">Mijoz parkovkalari</SheetTitle>
           </SheetHeader>
-          {/* {singleLoading ? (
-            <div className="10">
+          {userParkingsLoading ? (
+            <div className="h-[200px] flex items-center justify-center">
               <LoadingComp />
             </div>
-          ) : ( */}
-          <div className="grid gap-4 py-4">
-            <div>
-              <div className="flex justify-end"></div>
-              <h3 className="py-2 font-medium text-mediumParagraph">Umumiy buyurtmalar</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">Id</TableHead>
-                    <TableHead className="w-10">Mahsulot</TableHead>
-                    <TableHead className="w-10">Kredit vaqti</TableHead>
-                    <TableHead>To'lov</TableHead>
-                    <TableHead>Holat</TableHead>
-                    <TableHead>Qoldiq</TableHead>
-                    <TableHead className="text-right">Sanasi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {userId?.orders.map((payment: IOrder) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="py-2 md:py-2">{payment.id}</TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.product}</TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.month}</TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.amount}</TableCell>
-                      <TableCell className="py-2 md:py-2">
-                        {payment.payed ? (
-                          <Button
-                            variant="outline"
-                            className="text-green-600 border-green-500 h-7 whitespace-nowrap bg-green-100/20 text-smallparagraph hover:text-green-600"
-                          >
-                            To'langan
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            className="text-red-600 border-red-500 h-7 whitespace-nowrap bg-red-100/20 text-smallparagraph hover:text-red-600"
-                          >
-                            To'lanmagan
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-2 md:py-2">{payment.residual}</TableCell>
-                      <TableCell className="py-2 text-right md:py-2">{payment.date}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+          ) : (
+            <div className="grid gap-4 py-4">
+              <div>
+                <div className="relative max-h-[70vh] w-full overflow-y-auto rounded-lg border">
+                  <Table>
+                    <TableHeader>
+                      {tableParking.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => {
+                            return (
+                              <TableHead className="sticky top-0 z-[1]" key={header.id}>
+                                {header.isPlaceholder
+                                  ? null
+                                  : flexRender(header.column.columnDef.header, header.getContext())}
+                              </TableHead>
+                            );
+                          })}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody className="w-full">
+                      {tableParking.getRowModel().rows?.length ? (
+                        tableParking.getRowModel().rows.map((row) => {
+                          return (
+                            <TableRow
+                              key={row.id}
+                              data-state={row.getIsSelected() && "selected"}
+                            >
+                              {row.getVisibleCells().map((cell) => {
+                                return (
+                                  <TableCell key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                  </TableCell>
+                                );
+                              })}
+                            </TableRow>
+                          )
+                        })
+                      ) : (
+                        <TableRow className="h-[62vh] w-full">
+                          <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">
+                            Ma'lumot topilmadi.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
-          </div>
-          {/* )} */}
+          )}
         </SheetContent>
       </Sheet>
       <ClientCreate

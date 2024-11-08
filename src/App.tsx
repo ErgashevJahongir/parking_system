@@ -1,14 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Shops from "@/page/orders";
 import Layout from "@/layout";
 import ErrorPage from "@/components/error-page";
 import NotFound from "@/components/not-found";
 import Login from "@/page/login";
 import NotEndedOrders from "@/page/not-ended-orders";
-import ReportsStore from "@/page/reports-stores";
 import { getBaseName } from "@/utils/get-basename";
 import Admins from "@/page/admin";
 import ParkingType from "@/page/parking-type";
+import Parking from "./page/parkings";
 
 const router = createBrowserRouter(
   [
@@ -19,7 +18,7 @@ const router = createBrowserRouter(
       children: [
         {
           index: true,
-          element: <Shops />,
+          element: <Parking />,
         },
         {
           path: "client",
@@ -30,12 +29,8 @@ const router = createBrowserRouter(
           element: <ParkingType />,
         },
         {
-          path: "debetor-stores",
+          path: "not-ended-parking",
           element: <NotEndedOrders />,
-        },
-        {
-          path: "report-stores",
-          element: <ReportsStore />,
         },
       ],
     },

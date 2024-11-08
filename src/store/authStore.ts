@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>()(
       setToken: (token) => set({ token: token }),
     }),
     {
-      name: "cpm-admin",
+      name: "token-parking",
       storage: createJSONStorage(() => localStorage),
     },
   ),

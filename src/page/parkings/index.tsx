@@ -15,7 +15,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronDownIcon, Loader, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ChevronDownIcon, Loader, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   AlertDialog,
@@ -29,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useDelete, useList } from "./services";
-import { IParkingType } from "./index.type";
+import { IParking } from "./index.type";
 import { loadState } from "@/utils/storage";
 import {
   DropdownMenu,
@@ -40,8 +40,8 @@ import {
 import { cn, useDebounce } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import ClientUpdate from "./update";
 import ClientCreate from "./create";
+import dayjs from "dayjs";
 
 interface IPageFilter {
   page: number;
@@ -49,7 +49,7 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
-export default function ClientPage() {
+export default function Parking() {
   const { t } = useTranslation();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
@@ -72,8 +72,6 @@ export default function ClientPage() {
   } = useList(pageFilter?.page, pageFilter?.size, pageFilter.searchValue);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [addSheetOpen, setAddSheetOpen] = useState(false);
-  const [editSheetOpen, setEditSheetOpen] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     mutate(id, {
@@ -94,11 +92,34 @@ export default function ClientPage() {
     }
   }, [])
 
-  const columns: ColumnDef<IParkingType>[] = [
+  const columns: ColumnDef<IParking>[] = [
     {
       accessorKey: "id",
       meta: t("id"),
       header: t("id"),
+    },
+    {
+      accessorKey: "name",
+      meta: t("Mijoz"),
+      header: t("Mijoz"),
+    },
+    {
+      accessorKey: "car_number",
+      meta: t("Mashina raqami"),
+      header: t("Mashina raqami"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("car_number")}</p>,
+    },
+    {
+      accessorKey: "start_time",
+      meta: t("Kirish vaqti"),
+      header: t("Kirish vaqti"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("start_time")).format("YYYY-MM-DD HH:mm:ss")}</p>,
+    },
+    {
+      accessorKey: "end_time",
+      meta: t("Chiqish vaqti"),
+      header: t("Chiqish vaqti"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{(row.getValue("end_time")) ? dayjs(row.getValue("end_time")).format("YYYY-MM-DD HH:mm:ss") : ""}</p>,
     },
     {
       accessorKey: "type",
@@ -107,28 +128,10 @@ export default function ClientPage() {
       cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("type")}</p>,
     },
     {
-      accessorKey: "last_one_hour",
-      meta: t("1 soatgacha uchun"),
-      header: t("1 soatgacha uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_one_hour")}</p>,
-    },
-    {
-      accessorKey: "last_six_hour",
-      meta: t("6 soatgacha uchun"),
-      header: t("6 soatgacha uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_six_hour")}</p>,
-    },
-    {
-      accessorKey: "over_six_hour",
-      meta: t("6 soatdan ko'p uchun"),
-      header: t("6 soatdan ko'p uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("over_six_hour")}</p>,
-    },
-    {
-      accessorKey: "parking_count",
-      meta: t("Soni"),
-      header: t("Soni"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("parking_count")}</p>,
+      accessorKey: "summ",
+      meta: t("Summa"),
+      header: t("Summa"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("summ")}</p>,
     },
     {
       accessorKey: "action",
@@ -137,17 +140,6 @@ export default function ClientPage() {
       cell: ({ row }) => {
         return (
           <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                setEditId(row.original.id);
-                setTimeout(() => setEditSheetOpen(true), 200);
-              }}
-              size="icon"
-              className="size-8 md:size-10"
-              variant="secondary"
-            >
-              <Pencil className="w-4 h-4 text-warning md:h-5 md:w-5" />
-            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
@@ -180,7 +172,7 @@ export default function ClientPage() {
   ];
 
   const table = useReactTable({
-    data: tableData?.parking_rates || [],
+    data: tableData?.reservations || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -193,14 +185,14 @@ export default function ClientPage() {
     <section>
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="font-semibold text-loginTitle">
-          Parkovka turi va narxlar
+          Parkovkalar
           <sup className="ml-1.5 text-mediumParagraph">
             {tableData?.count && tableData?.count > 0 && tableData?.count}
           </sup>
         </h2>
         <Button onClick={() => setAddSheetOpen(true)} variant="outline">
           <Plus className="w-4 h-4 mr-2" />
-          Parkovka turi va narx  qo'shish
+          Parkovka qo'shish
         </Button>
       </div>
       <div className="flex flex-col items-center justify-between gap-3 mb-3 sm:flex-row md:mb-4">
@@ -308,13 +300,6 @@ export default function ClientPage() {
         setSheetOpen={setAddSheetOpen}
         sheetOpen={addSheetOpen}
         refetch={refetch}
-      />
-      <ClientUpdate
-        setSheetOpen={setEditSheetOpen}
-        sheetOpen={editSheetOpen}
-        refetch={refetch}
-        id={editId}
-        setEditId={setEditId}
       />
     </section>
   );

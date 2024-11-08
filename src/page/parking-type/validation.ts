@@ -5,16 +5,16 @@ const formSchema = () =>
     type: z.string().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
-    last_one_hour: z.number().min(2, {
+    last_one_hour: z.coerce.number().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
-    last_six_hour: z.number().min(2, {
+    last_six_hour: z.coerce.number().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
-    over_six_hour: z.number().min(2, {
+    over_six_hour: z.coerce.number().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
-    parking_count: z.number().min(2, {
+    parking_count: z.coerce.number().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
   });

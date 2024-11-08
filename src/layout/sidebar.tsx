@@ -1,6 +1,6 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CircleDollarSign, SquareParking, Store, User } from "lucide-react";
+import { CircleDollarSign, SquareParking, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 
@@ -22,7 +22,7 @@ const Sidebar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Store className="size-10" />
+                    <SquareParking className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
                     <p>{t("shops")}</p>
@@ -34,10 +34,10 @@ const Sidebar = () => {
           <li
             className={cn(
               "p-2 rounded-lg hover:bg-accent",
-              pathname === "/debetor-stores" && "bg-accent"
+              pathname === "/not-ended-parking" && "bg-accent"
             )}
           >
-            <Link className="flex" to="/debetor-stores">
+            <Link className="flex" to="/not-ended-parking">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>

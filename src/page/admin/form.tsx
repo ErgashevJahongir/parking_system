@@ -18,7 +18,7 @@ export default function NotificationForm({
       <div className="grid w-full gap-4">
         <FormField
           control={form.control}
-          name="full_name"
+          name="name"
           render={({ field }) => {
             return (
               <FormItem>

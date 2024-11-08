@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import NotificationForm from "./form";
 import { Form } from "@/components/ui/form";
-import { useDetails, useUpdate } from "./services";
-import { IEditSheetForm } from "./index.type";
+import { useCreate } from "./services";
+import { ICreateSheetForm } from "./index.type";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -15,38 +15,26 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import LoadingComp from "@/components/loadingComp";
 import { toast } from "sonner";
 import { formSchema } from "./validation";
+import dayjs from "dayjs";
 
-const AdminUpdate: React.FC<IEditSheetForm> = ({
-  sheetOpen,
-  setSheetOpen,
-  refetch,
-  id,
-  setEditId,
-}) => {
+const ParkingCreate: React.FC<ICreateSheetForm> = ({ sheetOpen, setSheetOpen, refetch }) => {
   const { t } = useTranslation();
   const formSchemaNotification = formSchema();
   const [errors, setErrors] = useState<Error>();
-  const { data, isLoading: singleLoading } = useDetails(id as string, !!id);
   const form = useForm<z.infer<typeof formSchemaNotification>>({
     resolver: zodResolver(formSchemaNotification),
   });
-  const { mutate: mutateUpdate, isPending } = useUpdate(id as string);
-
-  useEffect(() => {
-    if (data) {
-      form.reset({
-        ...data
-      });
-    }
-  }, [data, form]);
+  const { mutate: mutateCreate, isPending } = useCreate();
 
   const handleSubmit = (values: z.infer<typeof formSchemaNotification>) => {
-    mutateUpdate(values, {
+    mutateCreate({
+      ...values,
+      start_time: dayjs().format("YYYY-MM-DD HH:mm:ss")
+    }, {
       onSuccess: () => {
-        toast(t("Muvaffaqiyatli o'zgartirildi!"));
+        toast(t("Muvaffaqiyatli qo'shildi!"));
         form.reset();
         setSheetOpen(false);
         refetch();
@@ -62,36 +50,29 @@ const AdminUpdate: React.FC<IEditSheetForm> = ({
       open={sheetOpen}
       onOpenChange={(open) => {
         setSheetOpen(open);
-        !open && setEditId(null);
+        !open && form.reset();
       }}
     >
       <SheetContent
-        className="md:max-w-[700px] lg:max-w-[900px]"
+        className="md:max-w-[500px] lg:max-w-[700px]"
         side="right"
       >
         <SheetDescription className="hidden">hide</SheetDescription>
         <SheetHeader>
-          <SheetTitle className="text-left">Mijoz ma'lumotlari</SheetTitle>
+          <SheetTitle className="text-left">Parkovka ma'lumotlari</SheetTitle>
         </SheetHeader>
-        {singleLoading ? (
-          <div className="h-[200px]">
-            <LoadingComp />
-          </div>
-        ) : (
-          <Form {...form}>
-            <NotificationForm
-              isLoading={isPending}
-              errors={errors}
-              form={form}
-              handleSubmit={handleSubmit}
-              isUpdate
-              buttonText="Saqlash"
-            />
-          </Form>
-        )}
+        <Form {...form}>
+          <NotificationForm
+            isLoading={isPending}
+            errors={errors}
+            form={form}
+            handleSubmit={handleSubmit}
+            buttonText="Qo'shish"
+          />
+        </Form>
       </SheetContent>
     </Sheet>
   );
 };
 
-export default AdminUpdate;
+export default ParkingCreate;

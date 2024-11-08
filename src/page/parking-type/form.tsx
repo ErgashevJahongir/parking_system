@@ -39,7 +39,7 @@ export default function ParkingTypeForm({
               <FormItem>
                 <FormLabel>{t("1 soatchaga vaqt uchun narxi")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter")} {...field} />
+                  <Input type="number" placeholder={t("enter")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -54,7 +54,7 @@ export default function ParkingTypeForm({
               <FormItem>
                 <FormLabel>{t("6 soatchaga vaqt uchun narxi")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter")} {...field} />
+                  <Input type="number" placeholder={t("enter")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -69,7 +69,7 @@ export default function ParkingTypeForm({
               <FormItem>
                 <FormLabel>{t("6 soatdan ko'p vaqt uchn narxi")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter")} {...field} />
+                  <Input type="number" placeholder={t("enter")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,7 +84,7 @@ export default function ParkingTypeForm({
               <FormItem>
                 <FormLabel>{t("Soni")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter")} {...field} />
+                  <Input type="number" placeholder={t("enter")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

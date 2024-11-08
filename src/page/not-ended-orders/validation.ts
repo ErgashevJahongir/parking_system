@@ -2,12 +2,13 @@ import { z } from "zod";
 
 const formSchema = () =>
   z.object({
-    name: z.string().min(2, {
+    car_number: z.string().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
-    phone_number: z.string().min(2, {
+    parking_rate_id: z.string().min(2, {
       message: "Bu maydonni to'ldirish majburiy...",
     }),
+    user_id: z.string().nullable().optional(),
   });
 
 export { formSchema };

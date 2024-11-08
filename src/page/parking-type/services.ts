@@ -1,51 +1,44 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
+  IParkingType,
   IParkingTypeForm,
   IParkingTypeListResponse,
-  IParkingTypeSingleResponse,
 } from "./index.type";
 import request from "@/services/request";
 
 export const useList = (page: number, per_page: number, search: string | null) =>
   useQuery<IParkingTypeListResponse>({
-    queryKey: ["list-stores", page, per_page, search],
+    queryKey: ["list-parking-rate", page, per_page, search],
     queryFn: () =>
       request.private
-        .get("store", { params: { page, per_page, title: search } })
+        .get("parking/rates", { params: { page: page, limit: per_page, search: search } })
         .then((res) => res.data),
   });
 
 export const useCreate = () =>
   useMutation({
-    mutationKey: ["create-store"],
+    mutationKey: ["create-parking-rate"],
     mutationFn: (data: IParkingTypeForm) =>
-      request.private.post("store/", data).then((res) => res.data),
+      request.private.post("parking/rate", data).then((res) => res.data),
   });
 
-export const useDetails = (id: number, openModal: boolean) =>
-  useQuery<IParkingTypeSingleResponse>({
-    queryKey: [`store-detail-${id}`, id],
-    queryFn: () => request.private.get(`store/${id}`).then((res) => res.data),
+export const useDetails = (id: string, openModal: boolean) =>
+  useQuery<IParkingType>({
+    queryKey: [`parking-rate-detail-${id}`, id],
+    queryFn: () => request.private.get(`parking/rate/${id}`).then((res) => res.data),
     enabled: openModal,
   });
 
-export const useUpdate = (id: number) =>
+export const useUpdate = (id: string) =>
   useMutation({
-    mutationKey: ["update-store"],
+    mutationKey: ["update-parking-rate"],
     mutationFn: (data: IParkingTypeForm) =>
-      request.private.put(`store/${id}`, data).then((res) => res.data),
+      request.private.put(`parking/rate/${id}`, data).then((res) => res.data),
   });
 
 export const useDelete = () =>
   useMutation({
-    mutationKey: ["delete-store"],
-    mutationFn: (id: number) => request.private.delete(`store/${id}`).then((res) => res.data),
-  });
-
-export const useCreatePayment = async () =>
-  useMutation({
-    mutationKey: ["create-payment"],
-    mutationFn: (data: { amount: number }) =>
-      request.private.post("/admin/update/student/monthly/payment/", data).then((res) => res.data),
+    mutationKey: ["delete-parking-rate"],
+    mutationFn: (id: string) => request.private.delete(`parking/rate/${id}`).then((res) => res.data),
   });

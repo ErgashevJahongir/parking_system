@@ -1,10 +1,10 @@
 export interface IUser {
   id: number;
   fullname: string;
-  username: string;
+  phone_number: string;
 }
 
 export interface ILoginForm {
-  username: string;
+  phone_number: string;
   password: string;
 }

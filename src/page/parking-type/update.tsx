@@ -29,19 +29,18 @@ const AdminUpdate: React.FC<IEditSheetForm> = ({
   const { t } = useTranslation();
   const formSchemaNotification = formSchema();
   const [errors, setErrors] = useState<Error>();
-  const { data, isLoading: singleLoading } = useDetails(Number(id) as number, !!id);
+  const { data, isLoading: singleLoading } = useDetails(id as string, !!id);
   const form = useForm<z.infer<typeof formSchemaNotification>>({
     resolver: zodResolver(formSchemaNotification),
   });
-  const { mutate: mutateUpdate, isPending } = useUpdate(id as number);
+  const { mutate: mutateUpdate, isPending } = useUpdate(id as string);
 
   useEffect(() => {
-    // if (data) {
-    //   form.reset({
-    //     ...data.results,
-    //     stores: data.results.stores.map((item) => String(item.id)),
-    //   });
-    // }
+    if (data) {
+      form.reset({
+        ...data
+      });
+    }
   }, [data, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchemaNotification>) => {
@@ -75,7 +74,7 @@ const AdminUpdate: React.FC<IEditSheetForm> = ({
           <SheetTitle className="text-left">Parkovka turi va narx ma'lumotlari</SheetTitle>
         </SheetHeader>
         {singleLoading ? (
-          <div className="h-[200px]">
+          <div className="h-[200px] flex items-center justify-center">
             <LoadingComp />
           </div>
         ) : (
