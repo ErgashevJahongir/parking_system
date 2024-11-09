@@ -12,7 +12,7 @@ export const useList = (page: number, per_page: number, search: string | null) =
     queryKey: ["list-parking", page, per_page, search],
     queryFn: () =>
       request.private
-        .get("reservations/end/time", { params: { page: page, limit: per_page, search: search, end_time: true } })
+        .get("reservations/end/time", { params: { page: page, limit: per_page, search: search, end_time: false } })
         .then((res) => res.data),
   });
 
@@ -34,4 +34,16 @@ export const useDelete = () =>
   useMutation({
     mutationKey: ["delete-parking"],
     mutationFn: (id: string) => request.private.delete(`reservation/${id}`).then((res) => res.data),
+  });
+
+export const useSumma = (id: string, time: string) =>
+  useQuery<IParkingListResponse>({
+    queryKey: ["list-parking", id, time],
+    queryFn: () =>
+      request.private
+        .get("reservations/end/time", {
+          params: {
+          }
+        })
+        .then((res) => res.data),
   });

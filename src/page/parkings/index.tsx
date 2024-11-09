@@ -15,7 +15,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronDownIcon, Loader, Plus, Search, Trash2 } from "lucide-react";
+import { ChevronDownIcon, CircleX, Loader, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   AlertDialog,
@@ -140,6 +140,29 @@ export default function Parking() {
       cell: ({ row }) => {
         return (
           <div className="flex items-center gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
+                  <CircleX className="w-4 h-4 text-destructive md:h-5 md:w-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader className="mb-5">
+                  <AlertDialogTitle>Haqiqatdan parkovkani tugatmoqchimisiz?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Agar tasdiqlasangiz parkovka tugatiladi
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => { }}
+                  >
+                    Tasdiqlash
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
