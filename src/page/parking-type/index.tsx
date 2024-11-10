@@ -88,7 +88,7 @@ export default function ClientPage() {
   };
 
   useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityClient") || "{}")
+    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityParkingType") || "{}")
     if (storedData) {
       setColumnVisibility(storedData)
     }
@@ -237,7 +237,7 @@ export default function ClientPage() {
                       onCheckedChange={(value) => {
                         if (typeof window !== "undefined") {
                           window.localStorage.setItem(
-                            "columnVisibilityClient",
+                            "columnVisibilityParkingType",
                             JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
                           );
                         }

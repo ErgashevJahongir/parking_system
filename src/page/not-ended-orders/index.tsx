@@ -88,7 +88,7 @@ export default function Parking() {
   };
 
   useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityClient") || "{}")
+    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityParkingNotEnded") || "{}")
     if (storedData) {
       setColumnVisibility(storedData)
     }
@@ -251,7 +251,7 @@ export default function Parking() {
                       onCheckedChange={(value) => {
                         if (typeof window !== "undefined") {
                           window.localStorage.setItem(
-                            "columnVisibilityClient",
+                            "columnVisibilityParkingNotEnded",
                             JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
                           );
                         }

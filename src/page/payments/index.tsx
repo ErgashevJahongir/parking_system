@@ -59,7 +59,7 @@ export default function Payments() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityParking") || "{}")
+    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityPayments") || "{}")
     if (storedData) {
       setColumnVisibility(storedData)
     }
@@ -72,22 +72,22 @@ export default function Payments() {
       header: t("id"),
     },
     {
-      accessorKey: "amount",
+      accessorKey: "summ",
       meta: t("Summa"),
       header: t("Summa"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("amount")}</p>,
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("summ")}</p>,
     },
     {
-      accessorKey: "reservation",
+      accessorKey: "car_number",
       meta: t("Mashina raqami"),
       header: t("Mashina raqami"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("reservation")?.car_number}</p>,
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("car_number")}</p>,
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "end_time",
       meta: t("Vaqti"),
       header: t("Vaqti"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("created_at")).format("YYYY-MM-DD HH:mm:ss")}</p>,
+      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("end_time")).format("YYYY-MM-DD HH:mm:ss")}</p>,
     },
   ];
 
@@ -145,7 +145,7 @@ export default function Payments() {
                       onCheckedChange={(value) => {
                         if (typeof window !== "undefined") {
                           window.localStorage.setItem(
-                            "columnVisibilityParking",
+                            "columnVisibilityPayments",
                             JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
                           );
                         }
