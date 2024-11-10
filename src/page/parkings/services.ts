@@ -42,7 +42,7 @@ export const useSumma = (id: string, time: string, openModal: boolean) =>
     queryKey: ["summa-parking", id, time],
     queryFn: () =>
       request.private
-        .get(`reservations/summ/${id}`, {
+        .get(`reservation/summ/${id}`, {
           params: {
             end_time: time
           }

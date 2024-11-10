@@ -8,7 +8,7 @@ export interface IParking {
   parking_rate_id: string;
   user_id?: string | null;
   start_time: string;
-  end_timeы: string;
+  end_time: string;
 }
 
 export interface IParkingForm {
