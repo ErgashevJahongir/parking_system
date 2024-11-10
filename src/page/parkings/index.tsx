@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useDelete, useList } from "./services";
+import { useDelete, useList, useSumma } from "./services";
 import { IParking } from "./index.type";
 import { loadState } from "@/utils/storage";
 import {
@@ -72,6 +72,8 @@ export default function Parking() {
   } = useList(pageFilter?.page, pageFilter?.size, pageFilter.searchValue);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [addSheetOpen, setAddSheetOpen] = useState(false);
+  const [parkingId, setParkingId] = useState<string | null>(null);
+  const { data: sumData } = useSumma(parkingId as string, dayjs().format("YYYY-MM-DD HH:mm:ss"), !!parkingId);
 
   const handleDelete = (id: string) => {
     mutate(id, {
@@ -142,22 +144,19 @@ export default function Parking() {
           <div className="flex items-center gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
+                <Button onClick={() => { setParkingId(row.original.id) }} role="none" size="icon" className="size-8 md:size-10" variant="secondary">
                   <CircleX className="w-4 h-4 text-destructive md:h-5 md:w-5" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader className="mb-5">
-                  <AlertDialogTitle>Haqiqatdan parkovkani tugatmoqchimisiz?</AlertDialogTitle>
+                  <AlertDialogTitle>{sumData?.sum} so'm</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Agar tasdiqlasangiz parkovka tugatiladi
+                    Parkovka summasini faqat naqt ko'rinishda olinadi
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => { }}
-                  >
+                  <AlertDialogAction>
                     Tasdiqlash
                   </AlertDialogAction>
                 </AlertDialogFooter>

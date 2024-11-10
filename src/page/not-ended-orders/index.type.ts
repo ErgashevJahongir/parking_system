@@ -24,6 +24,10 @@ export interface IParkingListResponse {
   page: number;
 }
 
+export interface IParkingSummResponse {
+  sum: number
+}
+
 const formSchemaNotification = formSchema();
 
 export interface IParkingFormProps {

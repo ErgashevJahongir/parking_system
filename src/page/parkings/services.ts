@@ -4,6 +4,7 @@ import {
   IParking,
   IParkingForm,
   IParkingListResponse,
+  IParkingSummResponse,
 } from "./index.type";
 import request from "@/services/request";
 
@@ -34,4 +35,18 @@ export const useDelete = () =>
   useMutation({
     mutationKey: ["delete-parking"],
     mutationFn: (id: string) => request.private.delete(`reservation/${id}`).then((res) => res.data),
+  });
+
+export const useSumma = (id: string, time: string, openModal: boolean) =>
+  useQuery<IParkingSummResponse>({
+    queryKey: ["summa-parking", id, time],
+    queryFn: () =>
+      request.private
+        .get(`reservations/summ/${id}`, {
+          params: {
+            end_time: time
+          }
+        })
+        .then((res) => res.data),
+    enabled: openModal,
   });
