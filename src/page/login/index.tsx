@@ -10,6 +10,8 @@ import { loginRequest } from "@/services/request";
 import { useToast } from "@/components/ui/use-toast";
 import { ILoginForm } from "@/types";
 import { useNavigate } from "react-router-dom";
+import loginImg from "../../assets/smart-parking.jpg"
+
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,9 +74,7 @@ export default function Login() {
       <div className="container relative flex-col items-center justify-center h-screen lg:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div className="hidden h-full lg:block">
           <img
-            src="/public/smart-parking.jpg"
-            // width={1280}
-            // height={843}
+            src={loginImg}
             alt="Authentication"
             className="hidden object-cover h-full lg:block"
           />
