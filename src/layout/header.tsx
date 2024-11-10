@@ -61,7 +61,7 @@ export default function Header() {
   // }
 
   return (
-    <header className="flex h-[60px] items-center justify-between gap-5 border-b-2 bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="flex h-[60px] items-center justify-between gap-5 border-b-2 bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-white dark:bg-black">
       <div className="flex items-center gap-2">
         <MobileMenu />
         <Link to="/">

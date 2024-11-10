@@ -43,13 +43,4 @@ export const loginRequest = async (data: { phone_number: string; password: strin
   return res.data;
 };
 
-export const getUserData = async (token: string) => {
-  const res = await request.public.get("user/", {
-    headers: {
-      Authorization: `${token}`
-    }
-  }).then((res) => res);
-  return res.data;
-};
-
 export default request;

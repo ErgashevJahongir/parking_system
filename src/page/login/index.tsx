@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
-import { getUserData, loginRequest } from "@/services/request";
+import { loginRequest } from "@/services/request";
 import { useToast } from "@/components/ui/use-toast";
 import { ILoginForm } from "@/types";
 import { useNavigate } from "react-router-dom";
@@ -37,8 +37,7 @@ export default function Login() {
       const data = await loginRequest(values);
       setAccessToken(data?.access_token);
       if (data) {
-        const userData = await getUserData(data?.access_token)
-        setUser(userData);
+        setUser(data.user);
         navigate("/");
         reset();
       }

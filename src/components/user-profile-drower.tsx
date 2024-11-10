@@ -31,7 +31,7 @@ export default function UserProfilData() {
             <UserRound className="w-5 h-5" />
           </Button>
           <div className="hidden sm:block">
-            <h4 className="font-bold text-paragraphDefault">{user?.fullname || "Abdulfayz Usanov"}</h4>
+            <h4 className="font-bold text-paragraphDefault">{user?.name || "Abdulfayz Usanov"}</h4>
             <p className="text-smallparagraph">{`${user?.phone_number || "+998915867155"}`}</p>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function UserProfilData() {
               <UserRound className="w-5 h-5" />
             </Button>
             <div className="text-left">
-              <h4 className="font-bold text-paragraphDefault">{user?.fullname || "Abdulfayz Usanov"}</h4>
+              <h4 className="font-bold text-paragraphDefault">{user?.name || "Abdulfayz Usanov"}</h4>
               <p className="text-smallparagraph">{`${user?.phone_number || "+998915867155"}`}</p>
             </div>
           </div>

@@ -9,8 +9,8 @@ const Sidebar = () => {
   const { pathname } = useLocation()
 
   return (
-    <aside className="sticky hidden w-full border-r-2 screenHeight max-w-16 lg:max-w-20 md:block">
-      <nav className="my-3">
+    <aside className="sticky hidden w-full bg-white border-r-2 screenHeight max-w-16 lg:max-w-20 md:block dark:bg-black">
+      <nav className="my-3 bg-white dark:bg-black">
         <ul className="flex flex-col items-center justify-center gap-2 mx-auto">
           <li
             className={cn(

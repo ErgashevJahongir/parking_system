@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import Header from "./header";
 import Sidebar from "./sidebar";
 import { useAuthStore } from "@/store/authStore";
+import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 
 const Layout = () => {
   const { lang } = useParams();
@@ -23,15 +24,17 @@ const Layout = () => {
   }, [lang, i18n, user, token, navigate]);
 
   return (
-    <div className="layout">
-      <Header />
-      <div className="flex w-full h-full">
-        <Sidebar />
-        <main className="w-full p-4 lg:p-6">
-          <Outlet />
-        </main>
+    <BackgroundGradientAnimation>
+      <div className="layout">
+        <Header />
+        <div className="flex w-full h-full">
+          <Sidebar />
+          <main className="w-full p-4 lg:p-6">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </BackgroundGradientAnimation>
   );
 };
 
