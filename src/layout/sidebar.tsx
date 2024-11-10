@@ -1,6 +1,6 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CircleDollarSign, SquareParking, User } from "lucide-react";
+import { Car, CircleDollarSign, SquareParking, Type, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 
@@ -41,7 +41,7 @@ const Sidebar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <CircleDollarSign className="size-10" />
+                    <Car className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
                     <p>{t("Tugallanmagan parkovkalar")}</p>
@@ -50,25 +50,25 @@ const Sidebar = () => {
               </TooltipProvider>
             </Link>
           </li>
-          {/* <li
+          <li
             className={cn(
               "p-2 rounded-lg hover:bg-accent",
-              pathname === "/report-stores" && "bg-accent"
+              pathname === "/payments" && "bg-accent"
             )}
           >
-            <Link className="flex" to="/report-stores">
+            <Link className="flex" to="/payments">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <ChartPie className="size-10" />
+                    <CircleDollarSign className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>{t("statistic")}</p>
+                    <p>{t("To'lovlar")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </Link>
-          </li> */}
+          </li>
           <li
             className={cn(
               "p-2 rounded-lg hover:bg-accent",
@@ -98,7 +98,7 @@ const Sidebar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <SquareParking className="size-10" />
+                    <Type className="size-10" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
                     <p>{t("Parkovka turlari")}</p>

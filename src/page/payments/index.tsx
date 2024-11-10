@@ -36,7 +36,7 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
-export default function Parking() {
+export default function Payments() {
   const { t } = useTranslation();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
     page: 1,
@@ -72,40 +72,23 @@ export default function Parking() {
       header: t("id"),
     },
     {
-      accessorKey: "name",
-      meta: t("Mijoz"),
-      header: t("Mijoz"),
-    },
-    {
-      accessorKey: "car_number",
-      meta: t("Mashina raqami"),
-      header: t("Mashina raqami"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("car_number")}</p>,
-    },
-    {
-      accessorKey: "start_time",
-      meta: t("Kirish vaqti"),
-      header: t("Kirish vaqti"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("start_time")).format("YYYY-MM-DD HH:mm:ss")}</p>,
-    },
-    {
-      accessorKey: "end_time",
-      meta: t("Chiqish vaqti"),
-      header: t("Chiqish vaqti"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{(row.getValue("end_time")) ? dayjs(row.getValue("end_time")).format("YYYY-MM-DD HH:mm:ss") : ""}</p>,
-    },
-    {
-      accessorKey: "type",
-      meta: t("Turi"),
-      header: t("Turi"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("type")}</p>,
-    },
-    {
-      accessorKey: "summ",
+      accessorKey: "amount",
       meta: t("Summa"),
       header: t("Summa"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("summ")}</p>,
-    }
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("amount")}</p>,
+    },
+    {
+      accessorKey: "reservation",
+      meta: t("Mashina raqami"),
+      header: t("Mashina raqami"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("reservation")?.car_number}</p>,
+    },
+    {
+      accessorKey: "created_at",
+      meta: t("Vaqti"),
+      header: t("Vaqti"),
+      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("created_at")).format("YYYY-MM-DD HH:mm:ss")}</p>,
+    },
   ];
 
   const table = useReactTable({

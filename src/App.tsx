@@ -8,6 +8,7 @@ import { getBaseName } from "@/utils/get-basename";
 import Admins from "@/page/admin";
 import ParkingType from "@/page/parking-type";
 import Parking from "./page/parkings";
+import Payments from "./page/payments";
 
 const router = createBrowserRouter(
   [
@@ -23,6 +24,10 @@ const router = createBrowserRouter(
         {
           path: "client",
           element: <Admins />,
+        },
+        {
+          path: "payments",
+          element: <Payments />,
         },
         {
           path: "parking-type",
