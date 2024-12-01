@@ -2,12 +2,14 @@ import { IParking } from "../parkings/index.type";
 
 export interface IPayment {
   id: string;
-  amount: number
+  end_time: string
+  car_number: string
+  summ: number
   reservation: IParking
 }
 
 export interface IPaymentListResponse {
-  reservations: IPayment[];
+  payment: IPayment[];
   count: number;
   page: number;
 }

@@ -6,6 +6,7 @@ export interface IClient {
   id: string;
   name: string;
   phone_number: string;
+  created_at: string;
 }
 
 export interface IClientForm {

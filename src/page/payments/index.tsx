@@ -7,13 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
 import { buttonVariants } from "@/components/ui/button";
 import { ChevronDownIcon, Loader, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -36,6 +29,13 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
+interface Column {
+  id: string;
+  header: string;
+  accessorKey: keyof IPayment | "action";
+  cell: (row: IPayment) => JSX.Element;
+}
+
 export default function Payments() {
   const { t } = useTranslation();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
@@ -56,50 +56,56 @@ export default function Payments() {
     isLoading,
     refetch,
   } = useList(pageFilter?.page, pageFilter?.size, pageFilter.searchValue);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
 
+  // Load column visibility from localStorage on initial render
   useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityPayments") || "{}")
-    if (storedData) {
-      setColumnVisibility(storedData)
+    const storedVisibility = window.localStorage.getItem("columnVisibilityPayments");
+    if (storedVisibility) {
+      setColumnVisibility(JSON.parse(storedVisibility));
     }
-  }, [])
+  }, []);
 
-  const columns: ColumnDef<IPayment>[] = [
+  const toggleColumnVisibility = (columnId: string, value: boolean) => {
+    const updatedVisibility = { ...columnVisibility, [columnId]: value };
+    setColumnVisibility(updatedVisibility);
+
+    // Save the updated visibility in localStorage
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("columnVisibilityPayments", JSON.stringify(updatedVisibility));
+    }
+  };
+
+  const columns: Column[] = [
     {
-      accessorKey: "id",
-      meta: t("id"),
+      id: "id",
       header: t("id"),
+      accessorKey: "id",
+      cell: (row) => <p>{row.id}</p>,
     },
     {
-      accessorKey: "summ",
-      meta: t("Summa"),
+      id: "summ",
       header: t("Summa"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("summ")}</p>,
+      accessorKey: "summ",
+      cell: (row) => <p>{row.summ}</p>,
     },
     {
-      accessorKey: "car_number",
-      meta: t("Mashina raqami"),
+      id: "car_number",
       header: t("Mashina raqami"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("car_number")}</p>,
+      accessorKey: "car_number",
+      cell: (row) => <p>{row.car_number}</p>,
     },
     {
-      accessorKey: "end_time",
-      meta: t("Vaqti"),
+      id: "end_time",
       header: t("Vaqti"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{dayjs(row.getValue("end_time")).format("YYYY-MM-DD HH:mm:ss")}</p>,
+      accessorKey: "end_time",
+      cell: (row) => (
+        <p className="whitespace-nowrap">
+          {dayjs(row.end_time).format("YYYY-MM-DD HH:mm:ss")}
+        </p>
+      ),
     },
   ];
-
-  const table = useReactTable({
-    data: tableData?.reservations || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      columnVisibility,
-    },
-  });
 
   return (
     <section>
@@ -133,29 +139,18 @@ export default function Payments() {
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => {
-                        if (typeof window !== "undefined") {
-                          window.localStorage.setItem(
-                            "columnVisibilityPayments",
-                            JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
-                          );
-                        }
-                        return column.toggleVisibility(!!value);
-                      }}
-                    >
-                      {typeof column.columnDef.header === "string" && column.columnDef.header}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+              {columns
+                .filter((column) => column.accessorKey && column.header) // Filter columns that have an `accessorKey`
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={columnVisibility[column.id] ?? true} // Check if the column is visible or not
+                    onCheckedChange={(value) => toggleColumnVisibility(column.id, !!value)}
+                  >
+                    {column.header}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -163,19 +158,16 @@ export default function Payments() {
       <div className="relative max-h-[70vh] w-full overflow-y-auto rounded-lg border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead className="sticky top-0 z-[1]" key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              {columns.map((column) => {
+                const isVisible = columnVisibility[column.id] ?? true;
+                return isVisible ? (
+                  <TableHead className="sticky top-0 z-[1]" key={column.id}>
+                    {column.header}
+                  </TableHead>
+                ) : null;
+              })}
+            </TableRow>
           </TableHeader>
           <TableBody className="w-full">
             {isLoading ? (
@@ -184,24 +176,15 @@ export default function Payments() {
                   <Loader className="mx-auto size-10 animate-spin" />
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                return (
-                  <TableRow
-                    // onDoubleClick={() => navigate(`/store/update/${row.original.id}`)}
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                )
-              })
+            ) : tableData?.payment?.length ? (
+              tableData?.payment?.map((row) => (
+                <TableRow key={row.id}>
+                  {columns.map((column) => {
+                    const isVisible = columnVisibility[column.id] ?? true;
+                    return isVisible ? <TableCell key={column.id}>{column.cell(row)}</TableCell> : null;
+                  })}
+                </TableRow>
+              ))
             ) : (
               <TableRow className="h-[62vh] w-full">
                 <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">

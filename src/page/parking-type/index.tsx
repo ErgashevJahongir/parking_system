@@ -7,13 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ChevronDownIcon, Loader, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -49,6 +42,13 @@ interface IPageFilter {
   searchValue: string | null;
 }
 
+interface Column {
+  id: string;
+  header: string;
+  accessorKey: keyof IParkingType | "action";
+  cell: (row: IParkingType) => JSX.Element;
+}
+
 export default function ClientPage() {
   const { t } = useTranslation();
   const [pageFilter, setPageFilter] = useState<IPageFilter>({
@@ -70,10 +70,28 @@ export default function ClientPage() {
     isLoading,
     refetch,
   } = useList(pageFilter?.page, pageFilter?.size, pageFilter.searchValue);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [addSheetOpen, setAddSheetOpen] = useState(false);
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
+
+  // Load column visibility from localStorage on initial render
+  useEffect(() => {
+    const storedVisibility = window.localStorage.getItem("columnVisibilityParkingType");
+    if (storedVisibility) {
+      setColumnVisibility(JSON.parse(storedVisibility));
+    }
+  }, []);
+
+  const toggleColumnVisibility = (columnId: string, value: boolean) => {
+    const updatedVisibility = { ...columnVisibility, [columnId]: value };
+    setColumnVisibility(updatedVisibility);
+
+    // Save the updated visibility in localStorage
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("columnVisibilityParkingType", JSON.stringify(updatedVisibility));
+    }
+  };
 
   const handleDelete = (id: string) => {
     mutate(id, {
@@ -87,107 +105,94 @@ export default function ClientPage() {
     });
   };
 
-  useEffect(() => {
-    const storedData = JSON.parse(window.localStorage.getItem("columnVisibilityParkingType") || "{}")
-    if (storedData) {
-      setColumnVisibility(storedData)
-    }
-  }, [])
-
-  const columns: ColumnDef<IParkingType>[] = [
+  const columns: Column[] = [
     {
+      id: "id",
+      header: t("ID"),
       accessorKey: "id",
-      meta: t("id"),
-      header: t("id"),
+      cell: (row) => <p className="whitespace-nowrap">{row.id}</p>,
     },
     {
-      accessorKey: "type",
-      meta: t("Turi"),
+      id: "type",
       header: t("Turi"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("type")}</p>,
+      accessorKey: "type",
+      cell: (row) => <p className="whitespace-nowrap">{row.type}</p>,
     },
     {
-      accessorKey: "last_one_hour",
-      meta: t("1 soatgacha uchun"),
+      id: "last_one_hour",
       header: t("1 soatgacha uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_one_hour")}</p>,
+      accessorKey: "last_one_hour",
+      cell: (row) => <p className="whitespace-nowrap">{row.last_one_hour}</p>,
     },
     {
-      accessorKey: "last_six_hour",
-      meta: t("6 soatgacha uchun"),
+      id: "last_six_hour",
       header: t("6 soatgacha uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("last_six_hour")}</p>,
+      accessorKey: "last_six_hour",
+      cell: (row) => <p className="whitespace-nowrap">{row.last_six_hour}</p>,
     },
     {
-      accessorKey: "over_six_hour",
-      meta: t("6 soatdan ko'p uchun"),
+      id: "over_six_hour",
       header: t("6 soatdan ko'p uchun"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("over_six_hour")}</p>,
+      accessorKey: "over_six_hour",
+      cell: (row) => <p className="whitespace-nowrap">{row.over_six_hour}</p>,
     },
     {
-      accessorKey: "parking_count",
-      meta: t("Soni"),
+      id: "parking_count",
       header: t("Soni"),
-      cell: ({ row }) => <p className="whitespace-nowrap">{row.getValue("parking_count")}</p>,
+      accessorKey: "parking_count",
+      cell: (row) => <p className="whitespace-nowrap">{row.parking_count}</p>,
     },
     {
-      accessorKey: "action",
-      meta: t("action"),
+      id: "action",
       header: t("action"),
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                setEditId(row.original.id);
-                setTimeout(() => setEditSheetOpen(true), 200);
-              }}
-              size="icon"
-              className="size-8 md:size-10"
-              variant="secondary"
-            >
-              <Pencil className="w-4 h-4 text-warning md:h-5 md:w-5" />
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button role="none" size="icon" className="size-8 md:size-10" variant="secondary">
-                  <Trash2 className="w-4 h-4 text-destructive md:h-5 md:w-5" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader className="mb-5">
-                  <AlertDialogTitle>Haqiqatdan ham o'chirmoqchimisiz?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Agar tasdiqlasangiz ma'lumot bazadan o'chiriladi
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      handleDelete(row.original.id);
-                    }}
-                  >
-                    Tasdiqlash
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        );
-      },
+      accessorKey: "action",
+      cell: (row) => (
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => {
+              setEditId(row.id);
+              setTimeout(() => setEditSheetOpen(true), 200);
+            }}
+            size="icon"
+            className="size-8 md:size-10"
+            variant="secondary"
+          >
+            <Pencil className="w-4 h-4 text-warning md:h-5 md:w-5" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                role="none"
+                size="icon"
+                className="size-8 md:size-10"
+                variant="secondary"
+              >
+                <Trash2 className="w-4 h-4 text-destructive md:h-5 md:w-5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader className="mb-5">
+                <AlertDialogTitle>{t("Haqiqatdan ham o'chirmoqchimisiz?")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("Agar tasdiqlasangiz ma'lumot bazadan o'chiriladi")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("Bekor qilish")}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    handleDelete(row.id);
+                  }}
+                >
+                  {t("Tasdiqlash")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      ),
     },
   ];
-
-  const table = useReactTable({
-    data: tableData?.parking_rates || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      columnVisibility,
-    },
-  });
 
   return (
     <section>
@@ -225,29 +230,18 @@ export default function ClientPage() {
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => {
-                        if (typeof window !== "undefined") {
-                          window.localStorage.setItem(
-                            "columnVisibilityParkingType",
-                            JSON.stringify({ ...columnVisibility, [column.id]: !!value }),
-                          );
-                        }
-                        return column.toggleVisibility(!!value);
-                      }}
-                    >
-                      {typeof column.columnDef.header === "string" && column.columnDef.header}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+              {columns
+                .filter((column) => column.accessorKey && column.header) // Filter columns that have an `accessorKey`
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={columnVisibility[column.id] ?? true} // Check if the column is visible or not
+                    onCheckedChange={(value) => toggleColumnVisibility(column.id, !!value)}
+                  >
+                    {column.header}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -255,19 +249,16 @@ export default function ClientPage() {
       <div className="relative max-h-[70vh] w-full overflow-y-auto rounded-lg border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead className="sticky top-0 z-[1]" key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              {columns.map((column) => {
+                const isVisible = columnVisibility[column.id] ?? true;
+                return isVisible ? (
+                  <TableHead className="sticky top-0 z-[1]" key={column.id}>
+                    {column.header}
+                  </TableHead>
+                ) : null;
+              })}
+            </TableRow>
           </TableHeader>
           <TableBody className="w-full">
             {isLoadingDelete || isLoading ? (
@@ -276,24 +267,15 @@ export default function ClientPage() {
                   <Loader className="mx-auto size-10 animate-spin" />
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                return (
-                  <TableRow
-                    // onDoubleClick={() => navigate(`/store/update/${row.original.id}`)}
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                )
-              })
+            ) : tableData?.parking_rates?.length ? (
+              tableData?.parking_rates?.map((row) => (
+                <TableRow key={row.id}>
+                  {columns.map((column) => {
+                    const isVisible = columnVisibility[column.id] ?? true;
+                    return isVisible ? <TableCell key={column.id}>{column.cell(row)}</TableCell> : null;
+                  })}
+                </TableRow>
+              ))
             ) : (
               <TableRow className="h-[62vh] w-full">
                 <TableCell rowSpan={5} colSpan={columns.length} className="h-24 text-center">

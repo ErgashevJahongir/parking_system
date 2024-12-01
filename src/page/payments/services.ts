@@ -8,6 +8,6 @@ export const useList = (page: number, per_page: number, search: string | null) =
     queryKey: ["list-parking", page, per_page, search],
     queryFn: () =>
       request.private
-        .get("reservations/admin", { params: { page: page, limit: per_page, search: search } })
+        .get("payments/admin", { params: { page: page, limit: per_page, search: search } })
         .then((res) => res.data),
   });

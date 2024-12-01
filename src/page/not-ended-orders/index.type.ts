@@ -5,10 +5,11 @@ import { UseFormReturn } from "react-hook-form";
 export interface IParking {
   id: string;
   car_number: string;
-  parking_rate_id: string;
-  user_id?: string | null;
+  type: string;
+  name?: string | null;
   start_time: string;
-  end_timeы: string;
+  end_time: string;
+  summ: number;
 }
 
 export interface IParkingForm {
